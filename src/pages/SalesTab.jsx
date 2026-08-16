@@ -37,6 +37,9 @@ export default function SalesTab() {
     shippingMethod: row.shipping_method,
     shippingAddress: row.shipping_address,
     shippingCost: row.shipping_cost,
+    correoTrackingNumber: row.correo_tracking_number,
+    correoLabelUrl: row.correo_label_url,
+    correoShipmentStatus: row.correo_shipment_status,
     mercadopagoPaymentId: row.mercadopago_payment_id,
     createdAt: row.created_at ? new Date(row.created_at) : new Date(),
     updatedAt: row.updated_at ? new Date(row.updated_at) : null,
@@ -374,6 +377,10 @@ export default function SalesTab() {
                           <span className="method-badge me" title="Mercado Envíos" style={{ background: '#fff3e0', color: '#e65100', border: '1px solid #ffe0b2' }}>
                             <Truck size={14} /> Correo
                           </span>
+                        ) : sale.shippingMethod === 'correoargentino' ? (
+                          <span className="method-badge ca" title="Correo Argentino" style={{ background: '#fff3e0', color: '#c25e00', border: '1px solid #ffe0b2' }}>
+                            <Truck size={14} /> C. Argentino
+                          </span>
                         ) : (
                           <span className="method-badge co" title="Coordinar" style={{ background: '#f3e5f5', color: '#7b1fa2', border: '1px solid #e1bee7' }}>
                             <User size={14} /> Acordar
@@ -503,11 +510,27 @@ export default function SalesTab() {
                   <Truck size={18} />
                   <div>
                     <label>Método de Envío</label>
-                    <strong>{selectedSale.shippingMethod === 'mercadoenvios' ? 'Mercado Envíos' : 'Coordinar con el vendedor'}</strong>
+                    <strong>
+                      {selectedSale.shippingMethod === 'mercadoenvios' ? 'Mercado Envíos'
+                        : selectedSale.shippingMethod === 'correoargentino' ? 'Correo Argentino'
+                        : 'Coordinar con el vendedor'}
+                    </strong>
                     {selectedSale.shippingAddress && (
                       <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
                         {selectedSale.shippingAddress.street} {selectedSale.shippingAddress.number}<br/>
                         CP: {selectedSale.shippingAddress.zip} | {selectedSale.shippingAddress.city}
+                        {selectedSale.shippingAddress.province && ` | ${selectedSale.shippingAddress.province}`}
+                      </div>
+                    )}
+                    {selectedSale.shippingMethod === 'correoargentino' && (
+                      <div style={{ fontSize: '0.85rem', marginTop: '6px' }}>
+                        {selectedSale.correoLabelUrl ? (
+                          <a href={selectedSale.correoLabelUrl} target="_blank" rel="noreferrer" className="phone-link">
+                            Ver etiqueta ({selectedSale.correoTrackingNumber})
+                          </a>
+                        ) : (
+                          <span style={{ color: 'var(--text-muted)' }}>Etiqueta pendiente — generar desde la pestaña Envíos</span>
+                        )}
                       </div>
                     )}
                   </div>

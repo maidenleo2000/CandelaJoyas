@@ -83,7 +83,13 @@ export default function CartDrawer({ isOpen, onClose }) {
         payment_status: customerData.paymentMethod === 'mercadopago' ? 'pending' : 'not_applicable',
         shipping_method: customerData.shippingMethod || 'coordinate',
         shipping_address: customerData.address || null,
-        shipping_cost: customerData.shippingMethod === 'mercadoenvios' ? Number(settings.shippingCost || 0) : 0,
+        shipping_cost: customerData.shippingMethod === 'mercadoenvios'
+          ? Number(settings.shippingCost || 0)
+          : customerData.shippingMethod === 'correoargentino'
+            ? Number(customerData.shippingQuote?.cost || 0)
+            : 0,
+        correo_shipment_status: customerData.shippingMethod === 'correoargentino' ? 'pending' : null,
+        correo_shipment_data: customerData.shippingMethod === 'correoargentino' ? (customerData.shippingQuote || null) : null,
       };
 
       const { error: saleError } = await supabase.from('sales').insert(saleData);
@@ -142,7 +148,9 @@ export default function CartDrawer({ isOpen, onClose }) {
                 orderId: docRef.id,
                 shippingMethod: customerData.shippingMethod || 'coordinate',
                 address: customerData.address || null,
-                shippingCost: settings.shippingCost || 0,
+                shippingCost: customerData.shippingMethod === 'correoargentino'
+                  ? Number(customerData.shippingQuote?.cost || 0)
+                  : (settings.shippingCost || 0),
                 origin: window.location.origin // LE PASAMOS EL ORIGEN EXACTO
               }
             }

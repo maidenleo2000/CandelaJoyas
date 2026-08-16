@@ -1,7 +1,15 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { SettingsContext } from '../../contexts/SettingsContext';
-import { MessageCircle, CreditCard, Clock } from 'lucide-react';
+import { MessageCircle, CreditCard, Clock, Loader2 } from 'lucide-react';
+import { quoteCorreoEnvio } from '../../services/shipping';
 import '../common/ConfirmModal.css'; // Reuse basic modal overlay styles
+
+const ARGENTINA_PROVINCES = [
+  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes',
+  'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones',
+  'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
+  'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
+];
 
 export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmitting }) {
   const { settings } = useContext(SettingsContext);
@@ -12,16 +20,63 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
   const [phoneError, setPhoneError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [selectedMethod, setSelectedMethod] = useState(null); // 'whatsapp' or 'mercadopago'
-  const [shippingMethod, setShippingMethod] = useState('coordinate'); // 'coordinate' or 'mercadoenvios'
-  
+  const [shippingMethod, setShippingMethod] = useState('coordinate'); // 'coordinate', 'mercadoenvios' or 'correoargentino'
+
   // Address fields for shipping
   const [address, setAddress] = useState({
     street: '',
     number: '',
     zip: '',
-    city: ''
+    city: '',
+    province: ''
   });
   const [addressError, setAddressError] = useState('');
+
+  // Correo Argentino live quote
+  const [correoQuote, setCorreoQuote] = useState(null); // { cost, quoteId, raw }
+  const [quoting, setQuoting] = useState(false);
+  const [quoteError, setQuoteError] = useState('');
+  const quoteRequestId = useRef(0);
+
+  useEffect(() => {
+    if (shippingMethod !== 'correoargentino' || !settings?.enableCorreoArgentino) {
+      setCorreoQuote(null);
+      setQuoteError('');
+      return;
+    }
+    if (!/^\d{4}$/.test(address.zip.trim())) {
+      setCorreoQuote(null);
+      return;
+    }
+
+    const requestId = ++quoteRequestId.current;
+    const timer = setTimeout(async () => {
+      setQuoting(true);
+      setQuoteError('');
+      try {
+        const result = await quoteCorreoEnvio({
+          postalCodeOrigin: settings.correoOriginPostalCode,
+          postalCodeDestination: address.zip.trim(),
+          weightKg: settings.correoDefaultWeightKg,
+          lengthCm: settings.correoDefaultLengthCm,
+          widthCm: settings.correoDefaultWidthCm,
+          heightCm: settings.correoDefaultHeightCm,
+        });
+        if (quoteRequestId.current === requestId) {
+          setCorreoQuote(result);
+        }
+      } catch (error) {
+        if (quoteRequestId.current === requestId) {
+          setCorreoQuote(null);
+          setQuoteError(error.message || 'No se pudo cotizar el envío.');
+        }
+      } finally {
+        if (quoteRequestId.current === requestId) setQuoting(false);
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [shippingMethod, address.zip, settings?.enableCorreoArgentino]);
 
   if (!isOpen) return null;
 
@@ -60,10 +115,19 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
         hasError = true;
       }
 
-      // Validate address if Mercado Envios is selected
+      // Validate address if Mercado Envios or Correo Argentino is selected
       if (shippingMethod === 'mercadoenvios') {
         if (!address.street || !address.number || !address.zip || !address.city) {
           setAddressError('Todos los campos de dirección son obligatorios para el envío');
+          hasError = true;
+        }
+      }
+      if (shippingMethod === 'correoargentino') {
+        if (!address.street || !address.number || !address.zip || !address.city || !address.province) {
+          setAddressError('Todos los campos de dirección son obligatorios para el envío');
+          hasError = true;
+        } else if (!correoQuote) {
+          setAddressError(quoteError || 'Esperá a que se calcule el costo de envío.');
           hasError = true;
         }
       }
@@ -75,13 +139,16 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
       return;
     }
 
-    onConfirm({ 
-      customerName, 
-      customerPhone, 
+    const finalShippingMethod = selectedMethod === 'mercadopago' ? shippingMethod : 'coordinate';
+
+    onConfirm({
+      customerName,
+      customerPhone,
       customerEmail: selectedMethod === 'mercadopago' ? customerEmail : '',
       paymentMethod: selectedMethod,
-      shippingMethod: selectedMethod === 'mercadopago' ? shippingMethod : 'coordinate',
-      address: shippingMethod === 'mercadoenvios' ? address : null
+      shippingMethod: finalShippingMethod,
+      address: (finalShippingMethod === 'mercadoenvios' || finalShippingMethod === 'correoargentino') ? address : null,
+      shippingQuote: finalShippingMethod === 'correoargentino' ? correoQuote : null
     });
   };
 
@@ -246,7 +313,7 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
             </div>
           </div>
 
-          {selectedMethod === 'mercadopago' && settings?.enableMercadoEnvios && (
+          {selectedMethod === 'mercadopago' && (settings?.enableMercadoEnvios || settings?.enableCorreoArgentino) && (
             <div className="shipping-method-selector animate-fade-in" style={{ marginBottom: '2rem', padding: '1.5rem', background: 'rgba(255, 136, 0, 0.05)', borderRadius: '12px', border: '1px solid rgba(255, 136, 0, 0.1)' }}>
               <label style={{ display: 'block', marginBottom: '1rem', fontWeight: '600', color: 'var(--color-dark)' }}>
                 ¿Cómo querés recibir tu compra?
@@ -272,27 +339,50 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
                   </div>
                 </div>
 
-                <div 
-                  onClick={() => setShippingMethod('mercadoenvios')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.8rem',
-                    cursor: 'pointer',
-                    padding: '0.5rem'
-                  }}
-                >
-                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid #ff8800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {shippingMethod === 'mercadoenvios' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ff8800' }}></div>}
+                {settings?.enableMercadoEnvios && (
+                  <div
+                    onClick={() => setShippingMethod('mercadoenvios')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.8rem',
+                      cursor: 'pointer',
+                      padding: '0.5rem'
+                    }}
+                  >
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid #ff8800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {shippingMethod === 'mercadoenvios' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ff8800' }}></div>}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: '500', fontSize: '0.95rem' }}>Mercado Envíos</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Otros correos (Calculado por Mercado Pago)</div>
+                    </div>
                   </div>
-                  <div>
-                    <div style={{ fontWeight: '500', fontSize: '0.95rem' }}>Mercado Envíos</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Correo Argentino / Otros (Calculado por Mercado Pago)</div>
+                )}
+
+                {settings?.enableCorreoArgentino && (
+                  <div
+                    onClick={() => setShippingMethod('correoargentino')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.8rem',
+                      cursor: 'pointer',
+                      padding: '0.5rem'
+                    }}
+                  >
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid #ff8800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {shippingMethod === 'correoargentino' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ff8800' }}></div>}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: '500', fontSize: '0.95rem' }}>Correo Argentino</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Costo calculado según tu código postal</div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
-              {shippingMethod === 'mercadoenvios' && (
+              {(shippingMethod === 'mercadoenvios' || shippingMethod === 'correoargentino') && (
                 <div className="address-fields" style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <input 
@@ -321,15 +411,44 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
                       style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }}
                     />
                   </div>
-                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                    <input 
-                      type="text" 
-                      placeholder="Ciudad / Localidad" 
+                  <div className="form-group" style={{ gridColumn: shippingMethod === 'correoargentino' ? 'span 1' : 'span 2' }}>
+                    <input
+                      type="text"
+                      placeholder="Ciudad / Localidad"
                       value={address.city}
                       onChange={e => { setAddress({...address, city: e.target.value}); setAddressError(''); }}
                       style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }}
                     />
                   </div>
+                  {shippingMethod === 'correoargentino' && (
+                    <div className="form-group">
+                      <select
+                        value={address.province}
+                        onChange={e => { setAddress({...address, province: e.target.value}); setAddressError(''); }}
+                        style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                      >
+                        <option value="">Provincia</option>
+                        {ARGENTINA_PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                    </div>
+                  )}
+                  {shippingMethod === 'correoargentino' && (
+                    <div style={{ gridColumn: 'span 2', fontSize: '0.85rem' }}>
+                      {quoting && (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)' }}>
+                          <Loader2 size={14} className="spin" /> Calculando costo de envío...
+                        </span>
+                      )}
+                      {!quoting && correoQuote && (
+                        <span style={{ color: '#16a34a', fontWeight: 600 }}>
+                          Costo de envío: ${correoQuote.cost.toLocaleString()}
+                        </span>
+                      )}
+                      {!quoting && quoteError && (
+                        <span style={{ color: '#ff4d4d' }}>{quoteError}</span>
+                      )}
+                    </div>
+                  )}
                   {addressError && <small style={{ color: '#ff4d4d', gridColumn: 'span 2' }}>{addressError}</small>}
                 </div>
               )}

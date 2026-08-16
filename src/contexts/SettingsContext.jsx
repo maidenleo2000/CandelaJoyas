@@ -67,6 +67,13 @@ export default function SettingsProvider({ children }) {
     howToBuyWidth: 780,
     enableMercadoEnvios: false,
     shippingCost: 0,
+    // Correo Argentino (MiCorreo) Settings
+    enableCorreoArgentino: false,
+    correoOriginPostalCode: '',
+    correoDefaultWeightKg: 1,
+    correoDefaultLengthCm: 20,
+    correoDefaultWidthCm: 20,
+    correoDefaultHeightCm: 20,
     enableStockManagement: false,
     lowStockThreshold: 5,
   });

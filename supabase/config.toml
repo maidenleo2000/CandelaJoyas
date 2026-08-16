@@ -3,6 +3,9 @@ project_id = "tienda-cande"
 [functions.create-mp-preference]
 verify_jwt = false
 
+[functions.quote-correo-envio]
+verify_jwt = false
+
 [functions.confirm-mp-payment]
 verify_jwt = false
 

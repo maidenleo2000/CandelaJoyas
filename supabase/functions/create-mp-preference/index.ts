@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
       description: "Producto de indumentaria",
     }));
 
-    if (customerData?.shippingMethod === "mercadoenvios") {
+    if (customerData?.shippingMethod === "mercadoenvios" || customerData?.shippingMethod === "correoargentino") {
       const shipCost = Number(customerData.shippingCost || 0);
       if (shipCost > 0) {
         mpItems.push({

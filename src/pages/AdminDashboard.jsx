@@ -5,11 +5,12 @@ import { SettingsContext } from '../contexts/SettingsContext';
 import { supabase } from '../services/supabase';
 import { uploadFile, isStorageUrl, deleteFileByUrl } from '../services/storage';
 import toast from 'react-hot-toast';
-import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle, GalleryHorizontal } from 'lucide-react';
+import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle, GalleryHorizontal, Truck } from 'lucide-react';
 import { registerPush, unregisterPush } from '../services/pushNotifications';
 import { useProducts } from '../hooks/useProducts';
 import { useCategories } from '../hooks/useCategories';
 import SalesTab from './SalesTab';
+import EnviosTab from './EnviosTab';
 import UsersTab from './UsersTab';
 import AdminFaqs from '../components/admin/AdminFaqs';
 import CategoryManager from '../components/admin/CategoryManager';
@@ -812,13 +813,19 @@ export default function AdminDashboard() {
             >
               <Package size={20} /> Productos
             </button>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'sales' ? 'active' : ''}`}
               onClick={() => setActiveTab('sales')}
             >
               <ShoppingBag size={20} /> Ventas
             </button>
-            <button 
+            <button
+              className={`tab-btn ${activeTab === 'envios' ? 'active' : ''}`}
+              onClick={() => setActiveTab('envios')}
+            >
+              <Truck size={20} /> Envíos
+            </button>
+            <button
               className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
               onClick={() => setActiveTab('settings')}
             >
@@ -882,6 +889,10 @@ export default function AdminDashboard() {
       
       {activeTab === 'sales' && userRole === 'admin' && (
         <SalesTab />
+      )}
+
+      {activeTab === 'envios' && userRole === 'admin' && (
+        <EnviosTab />
       )}
 
       {activeTab === 'users' && userRole === 'admin' && (
