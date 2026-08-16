@@ -4,6 +4,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { toast } from 'react-hot-toast';
 import { Search, Trash2, Edit2, CheckCircle, Clock, Eye, X, Phone, User, Calendar, CreditCard, ShoppingBag, MessageSquare, Hash, Truck } from 'lucide-react';
+import { saleFromRow } from '../utils/salesMapper';
 import './SalesTab.css';
 
 export default function SalesTab() {
@@ -20,30 +21,14 @@ export default function SalesTab() {
   const [editFormData, setEditFormData] = useState({
     customerName: '',
     customerPhone: '',
-    status: ''
+    status: '',
+    trackingNumber: '',
+    trackingCarrier: '',
+    trackingUrl: ''
   });
   const [viewMode, setViewMode] = useState('month'); // 'month' or 'all'
 
-  const fromRow = (row) => ({
-    id: row.id,
-    customerName: row.customer_name,
-    customerPhone: row.customer_phone,
-    customerEmail: row.customer_email,
-    items: row.items,
-    total: row.total,
-    status: row.status,
-    paymentMethod: row.payment_method,
-    paymentStatus: row.payment_status,
-    shippingMethod: row.shipping_method,
-    shippingAddress: row.shipping_address,
-    shippingCost: row.shipping_cost,
-    correoTrackingNumber: row.correo_tracking_number,
-    correoLabelUrl: row.correo_label_url,
-    correoShipmentStatus: row.correo_shipment_status,
-    mercadopagoPaymentId: row.mercadopago_payment_id,
-    createdAt: row.created_at ? new Date(row.created_at) : new Date(),
-    updatedAt: row.updated_at ? new Date(row.updated_at) : null,
-  });
+  const fromRow = saleFromRow;
 
   useEffect(() => {
     // Si no hay usuario o no es admin, no hacemos la petición
@@ -100,7 +85,10 @@ export default function SalesTab() {
     setEditFormData({
       customerName: sale.customerName,
       customerPhone: sale.customerPhone,
-      status: sale.status || 'Pendiente'
+      status: sale.status || 'Pendiente',
+      trackingNumber: sale.trackingNumber || '',
+      trackingCarrier: sale.trackingCarrier || '',
+      trackingUrl: sale.trackingUrl || ''
     });
     setIsEditing(true);
   };
@@ -112,6 +100,9 @@ export default function SalesTab() {
         customer_name: editFormData.customerName,
         customer_phone: editFormData.customerPhone,
         status: editFormData.status,
+        tracking_number: editFormData.trackingNumber || null,
+        tracking_carrier: editFormData.trackingCarrier || null,
+        tracking_url: editFormData.trackingUrl || null,
         updated_at: new Date().toISOString(),
       }).eq('id', selectedSale.id);
       if (error) throw error;
@@ -421,6 +412,7 @@ export default function SalesTab() {
                         >
                           <option value="Pendiente">Pendiente</option>
                           <option value="Confirmada">Confirmada</option>
+                          <option value="Enviada">Enviada</option>
                           <option value="Completada">Completada</option>
                           <option value="Cancelada">Cancelada</option>
                         </select>
@@ -535,6 +527,25 @@ export default function SalesTab() {
                     )}
                   </div>
                 </div>
+                {(selectedSale.trackingNumber || selectedSale.trackingCarrier || selectedSale.trackingUrl) && (
+                  <div className="info-item">
+                    <Truck size={18} />
+                    <div>
+                      <label>Seguimiento</label>
+                      <strong>
+                        {selectedSale.trackingCarrier || 'Transportista'}
+                        {selectedSale.trackingNumber && ` — ${selectedSale.trackingNumber}`}
+                      </strong>
+                      {selectedSale.trackingUrl && (
+                        <div style={{ fontSize: '0.85rem', marginTop: '6px' }}>
+                          <a href={selectedSale.trackingUrl} target="_blank" rel="noreferrer" className="phone-link">
+                            Ver seguimiento
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="items-list-container">
@@ -587,15 +598,43 @@ export default function SalesTab() {
               </div>
               <div className="form-group">
                 <label>Estado de la Venta</label>
-                <select 
+                <select
                   value={editFormData.status}
                   onChange={(e) => setEditFormData({...editFormData, status: e.target.value})}
                 >
                   <option value="Pendiente">Pendiente</option>
                   <option value="Confirmada">Confirmada</option>
+                  <option value="Enviada">Enviada</option>
                   <option value="Completada">Completada</option>
                   <option value="Cancelada">Cancelada</option>
                 </select>
+              </div>
+              <div className="form-group">
+                <label>N° de Seguimiento</label>
+                <input
+                  type="text"
+                  value={editFormData.trackingNumber}
+                  onChange={(e) => setEditFormData({...editFormData, trackingNumber: e.target.value})}
+                  placeholder="Ej: AR123456789"
+                />
+              </div>
+              <div className="form-group">
+                <label>Transportista</label>
+                <input
+                  type="text"
+                  value={editFormData.trackingCarrier}
+                  onChange={(e) => setEditFormData({...editFormData, trackingCarrier: e.target.value})}
+                  placeholder="Ej: Andreani, OCA, Correo Argentino..."
+                />
+              </div>
+              <div className="form-group">
+                <label>URL de Seguimiento</label>
+                <input
+                  type="text"
+                  value={editFormData.trackingUrl}
+                  onChange={(e) => setEditFormData({...editFormData, trackingUrl: e.target.value})}
+                  placeholder="https://..."
+                />
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-outline" onClick={() => { setIsEditing(false); setSelectedSale(null); }}>Cancelar</button>

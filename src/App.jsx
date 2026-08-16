@@ -10,6 +10,7 @@ import MaintenancePage from './components/common/MaintenancePage';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import AdminDashboard from './pages/AdminDashboard';
+import AccountPage from './pages/AccountPage';
 import Nosotras from './pages/Nosotras';
 import HowToBuy from './pages/HowToBuy';
 import AdminGuide from './pages/AdminGuide';
@@ -43,6 +44,7 @@ function AppShell() {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/admin/guia" element={<AdminGuide />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
+          <Route path="/mi-cuenta" element={<AccountPage />} />
           <Route path="/nosotras" element={<Nosotras />} />
           <Route path="/como-comprar" element={<HowToBuy />} />
           <Route path="/success" element={<SuccessPage />} />

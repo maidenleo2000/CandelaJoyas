@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { CartContext } from "../../contexts/CartContext";
 import { SettingsContext } from "../../contexts/SettingsContext";
+import { AuthContext } from "../../contexts/AuthContext";
 import { X, ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { supabase } from "../../services/supabase";
@@ -18,6 +19,7 @@ export default function CartDrawer({ isOpen, onClose }) {
     clearCart
   } = useContext(CartContext);
   const { settings } = useContext(SettingsContext);
+  const { currentUser } = useContext(AuthContext);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -66,6 +68,7 @@ export default function CartDrawer({ isOpen, onClose }) {
       const saleId = crypto.randomUUID();
       const saleData = {
         id: saleId,
+        user_id: currentUser?.id || null,
         customer_name: customerData.customerName || 'Cliente',
         customer_phone: customerData.customerPhone || 'No proporcionado',
         customer_email: customerData.customerEmail || '',

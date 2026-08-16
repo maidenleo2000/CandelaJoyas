@@ -48,6 +48,20 @@ export default function AuthProvider({ children }) {
     return data;
   };
 
+  // Registro público de clientes. Nunca se envía "role": el trigger
+  // handle_new_user() en la base de datos ignora cualquier role que
+  // venga del cliente y siempre asigna 'client' (salvo emails admin
+  // hardcodeados), así que no hay forma de auto-otorgarse admin.
+  const register = async (email, password, displayName) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: displayName || '' } }
+    });
+    if (error) throw error;
+    return data;
+  };
+
   // Log Out function
   const logout = async () => {
     setUserRole(null);
@@ -114,6 +128,7 @@ export default function AuthProvider({ children }) {
     userData,
     updateUserData,
     login,
+    register,
     logout,
     changePassword
   };

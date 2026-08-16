@@ -13,7 +13,8 @@ import PendingSalesBanner from '../common/PendingSalesBanner';
 import './Header.css';
 
 export default function Header() {
-  const { currentUser, logout } = useContext(AuthContext);
+  const { currentUser, userRole, logout } = useContext(AuthContext);
+  const accountPath = userRole === 'admin' ? '/admin' : '/mi-cuenta';
   const { cartCount } = useContext(CartContext);
   const { settings } = useContext(SettingsContext);
   const { searchTerm, setSearchTerm, selectedCategory, setSelectedCategory } = useSearch();
@@ -120,8 +121,8 @@ export default function Header() {
             )}
             <Link to="/como-comprar" className="mobile-nav-link" onClick={closeMenu}>¿Cómo comprar?</Link>
             {currentUser && (
-              <Link to="/admin" className="mobile-nav-link admin-mobile-link" onClick={closeMenu}>
-                Panel Admin
+              <Link to={accountPath} className="mobile-nav-link admin-mobile-link" onClick={closeMenu}>
+                {userRole === 'admin' ? 'Panel Admin' : 'Mis Pedidos'}
               </Link>
             )}
           </nav>
@@ -132,8 +133,8 @@ export default function Header() {
                 <LogOut size={18} /> Cerrar Sesión
               </button>
             ) : (
-              <Link to="/admin" className="btn btn-primary w-full flex-center gap-2" onClick={closeMenu}>
-                <User size={18} /> Acceso Admin
+              <Link to="/mi-cuenta" className="btn btn-primary w-full flex-center gap-2" onClick={closeMenu}>
+                <User size={18} /> Mi Cuenta
               </Link>
             )}
           </div>
@@ -238,7 +239,7 @@ export default function Header() {
           </div>
 
           <div className="header-actions">
-            <Link to="/admin" className="action-btn" aria-label="Mi Cuenta">
+            <Link to={accountPath} className="action-btn" aria-label="Mi Cuenta">
               <User size={20} />
             </Link>
 

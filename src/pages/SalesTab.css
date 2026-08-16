@@ -251,6 +251,11 @@
   color: #1976d2;
 }
 
+.status-badge.enviada {
+  background: #ede7f6;
+  color: #5e35b1;
+}
+
 .status-badge.cancelada {
   background: #ffebee;
   color: #c62828;
