@@ -33,6 +33,12 @@ export default function SettingsProvider({ children }) {
     whatsappModalMessage: '¿Deseas realizar una consulta por WhatsApp con nuestros vendedores?',
     footerAddress: 'Buenos Aires, Argentina',
     footerDescription: 'Elegancia y estilo para cada ocasión. Descubre las últimas tendencias en moda femenina.',
+    // Page Header (Nosotras, Cómo Comprar, etc.)
+    pageHeaderGradientStart: '#D4A373',
+    pageHeaderGradientEnd: '#FAEDCD',
+    pageHeaderHeight: '220',
+    pageHeaderTitleColor: '#ffffff',
+    pageHeaderSubtitleColor: '#ffffff',
     // About Section
     showAbout: true,
     aboutTitle: 'Sobre Genoveva',

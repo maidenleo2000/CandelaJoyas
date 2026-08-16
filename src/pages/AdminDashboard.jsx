@@ -133,6 +133,11 @@ export default function AdminDashboard() {
     secondaryColor: '',
     logoUrl: '',
     logoShape: 'normal',
+    pageHeaderGradientStart: '#D4A373',
+    pageHeaderGradientEnd: '#FAEDCD',
+    pageHeaderHeight: '220',
+    pageHeaderTitleColor: '#ffffff',
+    pageHeaderSubtitleColor: '#ffffff',
     showAbout: true,
     aboutTitle: '',
     aboutText: '',
@@ -1809,6 +1814,101 @@ export default function AdminDashboard() {
                     <button type="button" onClick={resetColors} className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}>
                       <Palette size={14} /> Restablecer Colores por defecto
                     </button>
+                  </div>
+                </div>
+
+                <div className="settings-section">
+                  <h3><Layout size={18} /> Encabezado de Páginas (Nosotras, Cómo Comprar)</h3>
+                  <p className="text-muted" style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>Controla el gradiente, el alto y los colores de texto de la franja de título que aparece arriba de esas páginas.</p>
+
+                  <div className="color-grid">
+                    <div className="form-group">
+                      <label>Gradiente - Color Inicial</label>
+                      <div className="color-input-wrapper">
+                        <input
+                          type="color"
+                          name="pageHeaderGradientStart"
+                          value={siteSettings.pageHeaderGradientStart || '#D4A373'}
+                          onChange={handleSettingsChange}
+                        />
+                        <input
+                          type="text"
+                          name="pageHeaderGradientStart"
+                          value={siteSettings.pageHeaderGradientStart || '#D4A373'}
+                          onChange={handleSettingsChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label>Gradiente - Color Final</label>
+                      <div className="color-input-wrapper">
+                        <input
+                          type="color"
+                          name="pageHeaderGradientEnd"
+                          value={siteSettings.pageHeaderGradientEnd || '#FAEDCD'}
+                          onChange={handleSettingsChange}
+                        />
+                        <input
+                          type="text"
+                          name="pageHeaderGradientEnd"
+                          value={siteSettings.pageHeaderGradientEnd || '#FAEDCD'}
+                          onChange={handleSettingsChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label>Color del Título</label>
+                      <div className="color-input-wrapper">
+                        <input
+                          type="color"
+                          name="pageHeaderTitleColor"
+                          value={siteSettings.pageHeaderTitleColor || '#ffffff'}
+                          onChange={handleSettingsChange}
+                        />
+                        <input
+                          type="text"
+                          name="pageHeaderTitleColor"
+                          value={siteSettings.pageHeaderTitleColor || '#ffffff'}
+                          onChange={handleSettingsChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label>Color del Subtítulo</label>
+                      <div className="color-input-wrapper">
+                        <input
+                          type="color"
+                          name="pageHeaderSubtitleColor"
+                          value={siteSettings.pageHeaderSubtitleColor || '#ffffff'}
+                          onChange={handleSettingsChange}
+                        />
+                        <input
+                          type="text"
+                          name="pageHeaderSubtitleColor"
+                          value={siteSettings.pageHeaderSubtitleColor || '#ffffff'}
+                          onChange={handleSettingsChange}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                    <label>Alto del encabezado (px): <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{siteSettings.pageHeaderHeight || '220'} px</span></label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                      <input
+                        type="range"
+                        name="pageHeaderHeight"
+                        min="120"
+                        max="400"
+                        step="10"
+                        value={siteSettings.pageHeaderHeight || '220'}
+                        onChange={handleSettingsChange}
+                        style={{ flex: 1 }}
+                      />
+                      <div style={{ padding: '4px 10px', background: '#f0f0f0', borderRadius: '4px', fontSize: '0.8rem', minWidth: '80px', textAlign: 'center' }}>
+                        {siteSettings.pageHeaderHeight || '220'} px
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
