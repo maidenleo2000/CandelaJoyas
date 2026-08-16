@@ -1,0 +1,26 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  /* El Header es sticky y ya ocupa espacio en el flujo, no necesitamos padding-top extra */
+  padding-top: 0;
+  transition: padding-top 0.3s ease;
+}
+
+.has-marquee .main-content {
+  padding-top: 0;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 0;
+  }
+  
+  .has-marquee .main-content {
+    padding-top: 0;
+  }
+}

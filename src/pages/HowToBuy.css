@@ -1,0 +1,144 @@
+.how-to-buy-page {
+  padding-top: 4rem;
+  padding-bottom: 6rem;
+}
+
+.how-to-buy-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.how-to-buy-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-dark);
+}
+
+.how-to-buy-header p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 5rem;
+}
+
+.step-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-5px);
+}
+
+.step-icon-wrapper {
+  background: var(--color-primary);
+  color: #2B2D42;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 8px 16px rgba(212, 163, 115, 0.2);
+}
+
+.step-number {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #2B2D42;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.step-info h3 {
+  font-size: 1.35rem;
+  margin-bottom: 0.8rem;
+  color: var(--color-dark);
+}
+
+.step-info p {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.step-connector {
+  margin-left: auto;
+  color: var(--color-primary);
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 1rem;
+}
+
+.faq-section {
+  padding: 2.5rem;
+}
+
+.faq-section h2 {
+  text-align: center;
+  margin-bottom: 3rem;
+  font-size: 1.8rem;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--faq-cols, 2), 1fr);
+  gap: 2.5rem;
+}
+
+.faq-item h4 {
+  color: var(--color-primary);
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+}
+
+.faq-item p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .how-to-buy-page {
+    padding-top: 2rem;
+  }
+  
+  .step-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 2rem;
+  }
+  
+  .how-to-buy-header h1 {
+    font-size: 2rem;
+  }
+  
+  .faq-section {
+    padding: 2rem;
+  }
+
+  .faq-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

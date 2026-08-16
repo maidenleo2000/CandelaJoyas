@@ -1,0 +1,136 @@
+.pending-sales-banner {
+  position: relative;
+  z-index: 1100;
+  background: linear-gradient(135deg, #2B2D42 0%, #1a1b2e 100%);
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  max-width: 1200px;
+  width: 100%;
+  justify-content: center;
+}
+
+.banner-content:hover {
+  transform: translateY(-1px);
+}
+
+.banner-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.banner-icon {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background: rgba(212, 163, 115, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.banner-icon .badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 2px solid #2B2D42;
+}
+
+.banner-info p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.banner-info strong {
+  color: var(--color-primary);
+}
+
+.banner-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-primary);
+  color: #2B2D42;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.banner-content:hover .banner-action {
+  background: #E5B585;
+  box-shadow: 0 0 15px rgba(212, 163, 115, 0.3);
+}
+
+.banner-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 8px;
+  margin-left: 20px;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.banner-close:hover {
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .pending-sales-banner {
+    padding-top: calc(12px + var(--safe-area-top, 0px));
+    padding-bottom: 12px;
+  }
+
+  /* Si hay un Marquee arriba, no necesitamos duplicar el safe-area-top */
+  .marquee-container + .pending-sales-banner {
+    padding-top: 12px;
+  }
+
+  .banner-content {
+    gap: 12px;
+    justify-content: flex-start;
+  }
+  
+  .banner-info p {
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+
+  .banner-action {
+    display: none; /* Ocultar el botón en móvil para ahorrar espacio */
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

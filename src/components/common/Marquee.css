@@ -1,0 +1,52 @@
+:root {
+  --marquee-height: 36px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --marquee-height: 32px;
+  }
+}
+
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: calc(var(--marquee-height) + var(--safe-area-top, 0px));
+  padding-top: var(--safe-area-top, 0px);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.marquee-content {
+  display: inline-flex;
+  animation: marquee-animation 30s linear infinite;
+  padding-left: 100%;
+}
+
+.marquee-text {
+  padding: 0 2rem;
+  flex-shrink: 0;
+}
+
+@keyframes marquee-animation {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Pause animation on hover for better UX */
+.marquee-container:hover .marquee-content {
+  animation-play-state: paused;
+}
+
+

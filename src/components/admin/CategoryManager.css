@@ -1,0 +1,132 @@
+.category-manager {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.category-manager-header {
+  margin-bottom: 2rem;
+}
+
+.category-manager-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.category-manager-header p {
+  color: var(--text-muted);
+}
+
+.add-category-form {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.add-category-form .form-group {
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.add-category-form input {
+  flex: 1;
+}
+
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.category-item:hover {
+  transform: translateX(5px);
+  border-color: var(--color-primary);
+  background: white;
+  box-shadow: var(--shadow-md);
+}
+
+.category-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-dark);
+}
+
+.category-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.category-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.category-edit-mode {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+  align-items: center;
+}
+
+.category-edit-mode input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-primary);
+}
+
+.save-btn {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.save-btn:hover {
+  background-color: #16a34a;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #4b5563;
+}
+
+.cancel-btn:hover {
+  background-color: #4b5563;
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .add-category-form .form-group {
+    flex-direction: column;
+  }
+  
+  .add-category-form button {
+    width: 100%;
+  }
+  
+  .category-edit-mode {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

@@ -1,0 +1,330 @@
+.admin-guide-page {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  padding-bottom: 4rem;
+  color: #1e293b;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.guide-header {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-title h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.back-btn, .print-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.back-btn {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.back-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.print-btn {
+  background: var(--primary-color, #A08264);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(160, 130, 100, 0.2);
+}
+
+.print-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.guide-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  padding: 0 2rem;
+}
+
+.guide-sidebar {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.guide-sidebar h3 {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+.guide-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.guide-sidebar li {
+  margin-bottom: 0.5rem;
+}
+
+.guide-sidebar a {
+  display: block;
+  padding: 0.6rem 1rem;
+  color: #475569;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.guide-sidebar a:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.guide-tip-card {
+  margin-top: 2rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  border-radius: 12px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.guide-tip-card svg {
+  color: var(--primary-color, #A08264);
+  margin-bottom: 0.8rem;
+}
+
+.guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.guide-section {
+  padding: 2.5rem;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  scroll-margin-top: 100px;
+}
+
+.guide-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+}
+
+.guide-section h2 svg {
+  color: var(--primary-color, #A08264);
+}
+
+.guide-section p {
+  line-height: 1.7;
+  color: #475569;
+  margin-bottom: 1.5rem;
+}
+
+.highlight-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.step-card {
+  background: #f8fafc;
+  border-left: 4px solid var(--primary-color, #A08264);
+  padding: 1.5rem;
+  border-radius: 4px 8px 8px 4px;
+  margin-bottom: 1.5rem;
+}
+
+.step-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.step-card ul {
+  padding-left: 1.2rem;
+}
+
+.step-card li {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.info-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 1.25rem;
+  border-radius: 12px;
+}
+
+.info-card h4 {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.feature-highlight {
+  display: flex;
+  gap: 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.icon-wrapper {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  color: #2563eb;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge.pendiente { background: #fee2e2; color: #991b1b; }
+.badge.confirmada { background: #fef9c3; color: #854d0e; }
+.badge.completada { background: #dcfce7; color: #166534; }
+
+.two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.alert-box {
+  background: #fff7ed;
+  border: 1px solid #ffedd5;
+  color: #9a3412;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.guide-footer {
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 1024px) {
+  .guide-container {
+    grid-template-columns: 1fr;
+  }
+  .guide-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 1rem;
+  }
+  .header-title h1 {
+    font-size: 1.1rem;
+  }
+  .print-btn span {
+    display: none;
+  }
+  .info-grid, .two-cols {
+    grid-template-columns: 1fr;
+  }
+  .guide-section {
+    padding: 1.5rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .back-btn, .print-btn, .guide-sidebar, .guide-footer {
+    display: none !important;
+  }
+  .admin-guide-page {
+    background: white;
+    padding: 0;
+  }
+  .guide-container {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+  .guide-section {
+    border: none;
+    padding: 1rem 0;
+    page-break-inside: avoid;
+  }
+  .glass {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}

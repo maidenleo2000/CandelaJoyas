@@ -1,0 +1,19 @@
+project_id = "tienda-cande"
+
+[functions.create-mp-preference]
+verify_jwt = false
+
+[functions.confirm-mp-payment]
+verify_jwt = false
+
+[functions.meta-oauth-callback]
+verify_jwt = false
+
+[functions.on-sale-created-notify]
+verify_jwt = false
+
+[functions.on-sale-approved-notify]
+verify_jwt = false
+
+[functions.process-scheduled-social-posts]
+verify_jwt = false

@@ -1,0 +1,77 @@
+.nosotras-page {
+  padding-bottom: 4rem;
+}
+
+.nosotras-hero {
+  padding: 4rem 0;
+  text-align: center;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: white;
+}
+
+.nosotras-hero h1 {
+  font-size: 3rem;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nosotras-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-card {
+  padding: 3rem;
+  border-radius: 20px;
+  margin-bottom: 4rem;
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.about-text-content p {
+  white-space: pre-wrap;
+}
+
+.contact-section {
+  margin-top: 4rem;
+}
+
+.contact-card {
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.contact-card h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-primary);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.submit-btn {
+  align-self: center;
+  padding: 1rem 3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .nosotras-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .about-card, .contact-card {
+    padding: 2rem;
+  }
+}

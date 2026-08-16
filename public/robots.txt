@@ -1,0 +1,16 @@
+# Optimized robots.txt for Genoveva InduStore
+# Focused on inclusivity and efficiency
+
+User-agent: *
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /admin/*
+
+# Sitemap location
+Sitemap: https://genovevaindu.com.ar/sitemap.xml
+
+# Crawl-delay for some bots to preserve server resources
+User-agent: magpie-crawler
+Crawl-delay: 10

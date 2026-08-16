@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "463804391869",
+    "project_id": "tienda-c072c",
+    "storage_bucket": "tienda-c072c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463804391869:android:2847603059ecd4be02f2d4",
+        "android_client_info": {
+          "package_name": "com.genovevatienda.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp8DzIA2OcgWeo16WNvTlwOELOZGD9DSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463804391869:android:e886d731a1fcc4b402f2d4",
+        "android_client_info": {
+          "package_name": "com.tiendayesi.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp8DzIA2OcgWeo16WNvTlwOELOZGD9DSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
