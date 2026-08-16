@@ -5,7 +5,8 @@ import { SettingsContext } from '../contexts/SettingsContext';
 import { supabase } from '../services/supabase';
 import { uploadFile, isStorageUrl, deleteFileByUrl } from '../services/storage';
 import toast from 'react-hot-toast';
-import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle, GalleryHorizontal, Truck } from 'lucide-react';
+import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle, GalleryHorizontal, Truck, Wrench } from 'lucide-react';
+import { useMaintenanceStatus } from '../hooks/useMaintenanceStatus';
 import { registerPush, unregisterPush } from '../services/pushNotifications';
 import { useProducts } from '../hooks/useProducts';
 import { useCategories } from '../hooks/useCategories';
@@ -162,6 +163,11 @@ export default function AdminDashboard() {
     marqueeTextColor: '#ffffff',
     marqueeFontSize: '0.85',
     marqueeHeight: '36',
+    maintenanceMode: false,
+    maintenanceTitle: 'Sitio en Mantenimiento',
+    maintenanceMessage: '',
+    maintenanceEndsAt: '',
+    maintenanceAutoDisable: true,
   });
   const [logoFile, setLogoFile] = useState(null);
   const [faviconFile, setFaviconFile] = useState(null);
@@ -384,6 +390,23 @@ export default function AdminDashboard() {
     setSiteSettings(prev => ({ ...prev, [name]: val }));
   };
 
+  // Convierte un ISO string (UTC) al formato que espera <input type="datetime-local">
+  const isoToLocalInput = (iso) => {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return '';
+    const offsetMs = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+  };
+
+  const handleMaintenanceEndsAtChange = (e) => {
+    const localValue = e.target.value;
+    const iso = localValue ? new Date(localValue).toISOString() : '';
+    setSiteSettings(prev => ({ ...prev, maintenanceEndsAt: iso }));
+  };
+
+  const maintenanceStatus = useMaintenanceStatus(settings);
+
   const handleImageChange = (e) => {
     if (e.target.files.length > 0) {
       const files = Array.from(e.target.files).map(file => ({
@@ -601,18 +624,23 @@ export default function AdminDashboard() {
       if (showNewCategoryInput && finalCategory) {
         const categoryExists = categories.some(cat => cat.name.toLowerCase() === finalCategory.toLowerCase());
         if (!categoryExists) {
-          try {
-            const newCategory = {
-              id: Math.random().toString(36).substr(2, 9),
-              name: finalCategory
-            };
-            const { data: row } = await supabase.from('site_settings').select('data').eq('id', 1).single();
-            await supabase.from('site_settings').update({
+          const newCategory = {
+            id: Math.random().toString(36).substr(2, 9),
+            name: finalCategory
+          };
+          const { data: row, error: readError } = await supabase.from('site_settings').select('data').eq('id', 1).single();
+          if (readError) {
+            console.error("Error leyendo site_settings para agregar categoría:", readError);
+            toast.error(`No se pudo crear la categoría "${finalCategory}" (error al leer configuración). El producto se guardará con esa categoría de todos modos.`);
+          } else {
+            const { error: updateError } = await supabase.from('site_settings').update({
               data: { ...row.data, categories: [...(row.data?.categories || []), newCategory] },
               updated_at: new Date().toISOString(),
             }).eq('id', 1);
-          } catch (catErr) {
-            console.error("Error guardando nueva categoría en settings:", catErr);
+            if (updateError) {
+              console.error("Error guardando nueva categoría en settings:", updateError);
+              toast.error(`No se pudo crear la categoría "${finalCategory}" en el listado global. El producto se guardará con esa categoría de todos modos.`);
+            }
           }
         }
       }
@@ -1671,6 +1699,7 @@ export default function AdminDashboard() {
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'checkout' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('checkout')}><ClipboardCheck size={16} /> Checkout</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'footer' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('footer')}><Link size={16} /> Footer</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'about' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('about')}><User size={16} /> Nosotras</button>
+            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'maintenance' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('maintenance')}><Wrench size={16} /> Mantenimiento</button>
           </div>
           
           <form onSubmit={handleSettingsSubmit} className="settings-form">
@@ -2617,6 +2646,98 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {activeSettingsTab === 'maintenance' && (
+              <div className="animate-fade-in">
+                <div className="settings-section">
+                  <h3><Wrench size={18} /> Modo Mantenimiento</h3>
+                  <p className="text-muted" style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                    Muestra una pantalla de "en construcción" a todos los visitantes mientras realizas cambios. Los administradores siguen viendo el sitio normalmente.
+                  </p>
+
+                  <div className="form-group checkbox-group">
+                    <label className="checkbox-label" style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                      <input
+                        type="checkbox"
+                        name="maintenanceMode"
+                        checked={siteSettings.maintenanceMode}
+                        onChange={handleSettingsChange}
+                      />
+                      Activar Modo Mantenimiento
+                    </label>
+                  </div>
+
+                  {settings.maintenanceMode && (
+                    <div style={{
+                      padding: '0.75rem 1rem',
+                      borderRadius: '8px',
+                      marginBottom: '1.5rem',
+                      background: maintenanceStatus.active ? '#fef2f2' : '#f0fdf4',
+                      border: `1px solid ${maintenanceStatus.active ? '#fee2e2' : '#dcfce7'}`,
+                      color: maintenanceStatus.active ? '#dc2626' : '#16a34a',
+                      fontSize: '0.85rem',
+                      fontWeight: 600
+                    }}>
+                      {maintenanceStatus.active
+                        ? 'El sitio está actualmente EN MANTENIMIENTO para los visitantes.'
+                        : 'El contador llegó a 0 y el sitio se restauró automáticamente. Guarda los cambios para actualizar el estado.'}
+                    </div>
+                  )}
+
+                  <div className="animate-fade-in" style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.02)', borderRadius: '12px', border: '1px solid #eee' }}>
+                    <div className="form-group">
+                      <label>Título</label>
+                      <input
+                        name="maintenanceTitle"
+                        value={siteSettings.maintenanceTitle}
+                        onChange={handleSettingsChange}
+                        placeholder="Ej. Sitio en Mantenimiento"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Mensaje para los visitantes</label>
+                      <textarea
+                        name="maintenanceMessage"
+                        value={siteSettings.maintenanceMessage}
+                        onChange={handleSettingsChange}
+                        rows={4}
+                        placeholder="Estamos realizando mejoras. ¡Volvemos pronto!"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Contador regresivo (opcional)</label>
+                      <input
+                        type="datetime-local"
+                        value={isoToLocalInput(siteSettings.maintenanceEndsAt)}
+                        onChange={handleMaintenanceEndsAtChange}
+                      />
+                      <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: '5px' }}>
+                        Si lo dejas vacío, el sitio permanecerá en mantenimiento hasta que lo desactives manualmente.
+                      </p>
+                    </div>
+
+                    {siteSettings.maintenanceEndsAt && (
+                      <div className="form-group checkbox-group">
+                        <label className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            name="maintenanceAutoDisable"
+                            checked={siteSettings.maintenanceAutoDisable}
+                            onChange={handleSettingsChange}
+                          />
+                          Restaurar el sitio automáticamente cuando el contador llegue a 0
+                        </label>
+                        <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: '5px' }}>
+                          Si lo desactivas, el sitio seguirá en mantenimiento aunque el contador termine, hasta que lo apagues manualmente.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

@@ -76,6 +76,12 @@ export default function SettingsProvider({ children }) {
     correoDefaultHeightCm: 20,
     enableStockManagement: false,
     lowStockThreshold: 5,
+    // Maintenance Mode Settings
+    maintenanceMode: false,
+    maintenanceTitle: 'Sitio en Mantenimiento',
+    maintenanceMessage: 'Estamos realizando mejoras para ofrecerte una mejor experiencia. ¡Volvemos pronto!',
+    maintenanceEndsAt: '',
+    maintenanceAutoDisable: true,
   });
   const [loading, setLoading] = useState(true);
   const settingsRef = useRef(settings);

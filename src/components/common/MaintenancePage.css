@@ -1,0 +1,95 @@
+.maintenance-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--maintenance-gradient-start), var(--maintenance-gradient-end));
+}
+
+.maintenance-box {
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.maintenance-logo {
+  max-height: 60px;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
+}
+
+.maintenance-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--maintenance-gradient-start);
+  margin-bottom: 1.5rem;
+}
+
+.maintenance-box h1 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: #2B2D42;
+}
+
+.maintenance-box p {
+  color: #555;
+  line-height: 1.6;
+  font-size: 1rem;
+  white-space: pre-wrap;
+}
+
+.maintenance-countdown {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  padding: 0.75rem 0.5rem;
+}
+
+.countdown-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2B2D42;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 480px) {
+  .maintenance-box {
+    padding: 2rem 1.5rem;
+  }
+  .maintenance-countdown {
+    gap: 0.5rem;
+  }
+  .countdown-unit {
+    min-width: 50px;
+    padding: 0.5rem 0.25rem;
+  }
+}
