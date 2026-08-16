@@ -80,7 +80,7 @@ const AdminGuide = () => {
         <main className="guide-content">
           <section id="intro" className="guide-section glass">
             <h2><BookOpen size={24} /> Introducción</h2>
-            <p>Bienvenido al centro de control de <strong>Genoveva InduStore</strong>. Este manual está diseñado para que puedas autogestionar tu tienda de manera profesional, desde la carga de stock hasta la personalización de tu marca.</p>
+            <p>Bienvenido al centro de control de <strong>Candela Joyas</strong>. Este manual está diseñado para que puedas autogestionar tu tienda de manera profesional, desde la carga de stock hasta la personalización de tu marca.</p>
             <div className="highlight-box">
               <CheckCircle2 size={20} />
               <p>Todos los cambios que realices se reflejan instantáneamente en la web para tus clientes.</p>
@@ -148,7 +148,7 @@ const AdminGuide = () => {
 
           <section id="config" className="guide-section glass">
             <h2><Settings size={24} /> Configuración del Sitio</h2>
-            <p>Personaliza la identidad visual de Genoveva sin diseñadores.</p>
+            <p>Personaliza la identidad visual de Candela Joyas sin diseñadores.</p>
             <ul>
               <li><strong>Marca:</strong> Sube tu logo y el favicon. El favicon es la fotito que aparece en la pestaña del navegador. ¡El sistema lo hace redondo solo!</li>
               <li><strong>Colores:</strong> Elige el color que domina la web (Primario) y el de fondo (Secundario).</li>
@@ -183,7 +183,7 @@ const AdminGuide = () => {
       </div>
 
       <footer className="guide-footer">
-        <p>© 2026 Genoveva InduStore - Panel de Administración</p>
+        <p>© 2026 Candela Joyas - Panel de Administración</p>
       </footer>
     </div>
   );

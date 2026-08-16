@@ -7,7 +7,7 @@ export default function Nosotras() {
   const { settings } = useContext(SettingsContext);
   
   useEffect(() => {
-    const baseTitle = settings.siteTitle || 'Genoveva InduStore';
+    const baseTitle = settings.siteTitle || 'Candela Joyas';
     document.title = `${settings.aboutTitle || 'Nosotras'} | ${baseTitle}`;
   }, [settings.siteTitle, settings.aboutTitle]);
 

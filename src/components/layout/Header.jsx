@@ -75,7 +75,7 @@ export default function Header() {
         />
       )}
       <div className="logo-text">
-        <span className="logo-main">{(settings.siteTitle || 'Genoveva InduStore').split(' ')[0]}</span>
+        <span className="logo-main">{(settings.siteTitle || 'Candela Joyas').split(' ')[0]}</span>
         <span className="logo-accent">{(settings.siteTitle || '').split(' ').slice(1).join(' ')}</span>
       </div>
     </Link>

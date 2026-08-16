@@ -42,10 +42,10 @@ export default function Footer() {
         <div className="footer-section brand">
           <Link to="/" className="logo footer-logo">
             {settings.logoUrl && (
-              <img src={settings.logoUrl} alt={settings.siteTitle || 'Genoveva'} className="logo-img" style={getLogoStyle(settings.logoShape)} />
+              <img src={settings.logoUrl} alt={settings.siteTitle || 'Candela'} className="logo-img" style={getLogoStyle(settings.logoShape)} />
             )}
             <div className="logo-text">
-              <span className="logo-main">{(settings.siteTitle || 'Genoveva InduStore').split(' ')[0]}</span>
+              <span className="logo-main">{(settings.siteTitle || 'Candela Joyas').split(' ')[0]}</span>
               <span className="logo-accent">{(settings.siteTitle || '').split(' ').slice(1).join(' ')}</span>
             </div>
           </Link>

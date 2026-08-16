@@ -107,7 +107,7 @@ export default function ProductDetail() {
   // SEO: Update page title with product name
   useEffect(() => {
     if (product) {
-      const baseTitle = settings.siteTitle || 'Genoveva InduStore';
+      const baseTitle = settings.siteTitle || 'Candela Joyas';
       document.title = `${product.name} - Talles Reales | ${baseTitle}`;
     }
   }, [product, settings.siteTitle]);

@@ -6,7 +6,7 @@ export const SettingsContext = createContext();
 
 export default function SettingsProvider({ children }) {
   const [settings, setSettings] = useState({
-    siteTitle: 'GENOVEVA InduStore',
+    siteTitle: 'Candela Joyas',
     primaryColor: '#D4A373',
     secondaryColor: '#FAEDCD',
     logoUrl: '',

@@ -206,7 +206,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    document.title = 'Panel de Administración | Genoveva InduStore';
+    document.title = 'Panel de Administración | Candela Joyas';
   }, []);
 
   useEffect(() => {

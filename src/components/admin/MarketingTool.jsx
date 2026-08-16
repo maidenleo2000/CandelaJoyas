@@ -213,7 +213,7 @@ const MarketingTool = ({ products }) => {
       ctx.font = "bold 34px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(
-        settings?.siteTitle || "GENOVEVA InduStore",
+        settings?.siteTitle || "Candela Joyas",
         bx + brandWidth / 2,
         by + 58,
       );
@@ -246,7 +246,7 @@ const MarketingTool = ({ products }) => {
 
       ctx.font = "bold 44px sans-serif";
       ctx.fillStyle = "rgba(255,255,255,1)";
-      ctx.fillText("www.genovevaindu.com.ar", 50, height - 65);
+      ctx.fillText("www.candelajoyas.com.ar", 50, height - 65);
 
       const dataUrl = canvas.toDataURL("image/png");
       const fileName = `PLACA_${selectedProduct.name.replace(/\s+/g, "_")}.png`;
@@ -494,7 +494,7 @@ const MarketingTool = ({ products }) => {
               <div className={`shareable-plate ${format}`}>
                 <div className="plate-content">
                   <div className="plate-brand">
-                    {settings?.siteTitle || "GENOVEVA InduStore"}
+                    {settings?.siteTitle || "Candela Joyas"}
                   </div>
                   <div
                     className="plate-price-tag"
@@ -514,7 +514,7 @@ const MarketingTool = ({ products }) => {
                   </div>
                   <div className="plate-overlay">
                     <div className="plate-title">{selectedProduct.name}</div>
-                    <div className="plate-url">www.genovevaindu.com.ar</div>
+                    <div className="plate-url">www.candelajoyas.com.ar</div>
                   </div>
                 </div>
               </div>

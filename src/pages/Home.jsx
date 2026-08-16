@@ -102,7 +102,7 @@ export default function Home() {
 
   // SEO: Actualizamos el título de la pestaña según la categoría seleccionada
   useEffect(() => {
-    const baseTitle = settings.siteTitle || 'Genoveva InduStore';
+    const baseTitle = settings.siteTitle || 'Candela Joyas';
     if (selectedCategory === 'All') {
       document.title = `${baseTitle} | Moda Inclusiva en Talles Reales`;
     } else {

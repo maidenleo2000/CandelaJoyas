@@ -66,7 +66,7 @@ export default function HowToBuy() {
     <div className="container how-to-buy-page animate-fade-in" style={{ maxWidth: `${pageWidth}px` }}>
       <div className="how-to-buy-header">
         <h1>¿Cómo Comprar?</h1>
-        <p>Comprar en Genoveva InduStore es muy simple y rápido. Seguí estos pasos:</p>
+        <p>Comprar en Candela Joyas es muy simple y rápido. Seguí estos pasos:</p>
       </div>
 
       <div className="steps-container">

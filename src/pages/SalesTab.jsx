@@ -334,7 +334,7 @@ export default function SalesTab() {
                         <strong>{sale.customerName}</strong>
                         {sale.customerPhone && sale.customerPhone !== 'No proporcionado' && (
                           <a 
-                            href={`https://wa.me/${sale.customerPhone.replace(/\D/g, '').length <= 10 ? '549' + sale.customerPhone.replace(/\D/g, '') : sale.customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${sale.customerName}! Te contacto de Genoveva InduStore por tu pedido de: ${sale.items?.map(item => `${item.name} (x${item.quantity})`).join(', ')}. Si querés añadir más productos podés hacerlo desde el carrito, sino podemos coordinar ahora el pago y envío de la compra.`)}`} 
+                            href={`https://wa.me/${sale.customerPhone.replace(/\D/g, '').length <= 10 ? '549' + sale.customerPhone.replace(/\D/g, '') : sale.customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${sale.customerName}! Te contacto de Candela Joyas por tu pedido de: ${sale.items?.map(item => `${item.name} (x${item.quantity})`).join(', ')}. Si querés añadir más productos podés hacerlo desde el carrito, sino podemos coordinar ahora el pago y envío de la compra.`)}`} 
                             target="_blank" 
                             rel="noreferrer"
                             className="phone-link"
@@ -455,7 +455,7 @@ export default function SalesTab() {
                   <div>
                     <label>Teléfono</label>
                     <a 
-                      href={`https://wa.me/${selectedSale.customerPhone.replace(/\D/g, '').length <= 10 ? '549' + selectedSale.customerPhone.replace(/\D/g, '') : selectedSale.customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${selectedSale.customerName}! Te contacto de Genoveva InduStore por tu pedido de: ${selectedSale.items?.map(item => `${item.name} (x${item.quantity})`).join(', ')}. Si querés añadir más productos podés hacerlo desde el carrito, sino podemos coordinar ahora el pago y envío de la compra.`)}`} 
+                      href={`https://wa.me/${selectedSale.customerPhone.replace(/\D/g, '').length <= 10 ? '549' + selectedSale.customerPhone.replace(/\D/g, '') : selectedSale.customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${selectedSale.customerName}! Te contacto de Candela Joyas por tu pedido de: ${selectedSale.items?.map(item => `${item.name} (x${item.quantity})`).join(', ')}. Si querés añadir más productos podés hacerlo desde el carrito, sino podemos coordinar ahora el pago y envío de la compra.`)}`} 
                       target="_blank" 
                       rel="noreferrer"
                       className="phone-link-large"
