@@ -67,7 +67,7 @@ const processImage = (file, maxWidth, quality = 0.85) => {
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { currentUser, userRole, userData, updateUserData, login, logout, changePassword } = useContext(AuthContext);
-  const { products, loading: productsLoading } = useProducts();
+  const { products, loading: productsLoading, refetch: refetchProducts } = useProducts();
   const { categories, loading: categoriesLoading } = useCategories();
   const { settings, updateSettings } = useContext(SettingsContext);
   
@@ -584,6 +584,7 @@ export default function AdminDashboard() {
         const { error: deleteError } = await supabase.from('products').delete().eq('id', id);
         if (deleteError) throw deleteError;
         toast.success("Producto e imágenes eliminados correctamente");
+        refetchProducts();
       } catch(e) {
         console.error(e);
         toast.error("Error eliminando producto");
@@ -727,6 +728,7 @@ export default function AdminDashboard() {
         if (error) throw error;
         toast.success("¡Producto agregado a tu tienda!");
       }
+      await refetchProducts();
       resetForm();
     } catch (e) {
       console.error("Error completo:", e);
@@ -810,7 +812,8 @@ export default function AdminDashboard() {
       });
 
       await Promise.all(updatePromises);
-      
+      await refetchProducts();
+
       toast.success(`Precios actualizados correctamente para ${products.length} productos.`);
       setShowBulkPriceModal(false);
       setBulkPricePercentage('');

@@ -61,5 +61,17 @@ export function useProducts() {
     };
   }, []);
 
-  return { products, loading, error };
+  const refetch = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('products').select('*');
+    if (error) {
+      console.error("Error obteniendo productos:", error);
+      setError(error.message);
+    } else {
+      setProducts((data || []).map(fromRow));
+    }
+    setLoading(false);
+  };
+
+  return { products, loading, error, refetch };
 }
