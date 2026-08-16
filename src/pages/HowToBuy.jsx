@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ShoppingBag, ShoppingCart, UserCheck, MessageCircle, ChevronRight } from 'lucide-react';
 import { supabase } from '../services/supabase';
 import { SettingsContext } from '../contexts/SettingsContext';
+import PageHeader from '../components/common/PageHeader';
 import './HowToBuy.css';
 
 export default function HowToBuy() {
@@ -63,12 +64,13 @@ export default function HowToBuy() {
   ];
 
   return (
-    <div className="container how-to-buy-page animate-fade-in" style={{ maxWidth: `${pageWidth}px` }}>
-      <div className="how-to-buy-header">
-        <h1>¿Cómo Comprar?</h1>
-        <p>Comprar en Candela Joyas es muy simple y rápido. Seguí estos pasos:</p>
-      </div>
+    <div className="how-to-buy-page animate-fade-in">
+      <PageHeader
+        title="¿Cómo Comprar?"
+        subtitle={`Comprar en ${settings.siteTitle || 'Candela Joyas'} es muy simple y rápido. Seguí estos pasos:`}
+      />
 
+      <div className="container how-to-buy-content" style={{ maxWidth: `${pageWidth}px` }}>
       <div className="steps-container">
         {steps.map((step, index) => (
           <div key={index} className="step-card glass">
@@ -103,6 +105,7 @@ export default function HowToBuy() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

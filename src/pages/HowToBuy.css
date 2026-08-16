@@ -1,22 +1,5 @@
 .how-to-buy-page {
-  padding-top: 4rem;
   padding-bottom: 6rem;
-}
-
-.how-to-buy-header {
-  text-align: center;
-  margin-bottom: 4rem;
-}
-
-.how-to-buy-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: var(--color-dark);
-}
-
-.how-to-buy-header p {
-  font-size: 1.1rem;
-  color: var(--text-muted);
 }
 
 .steps-container {
@@ -128,10 +111,6 @@
     text-align: center;
     gap: 1.5rem;
     padding: 2rem;
-  }
-  
-  .how-to-buy-header h1 {
-    font-size: 2rem;
   }
   
   .faq-section {

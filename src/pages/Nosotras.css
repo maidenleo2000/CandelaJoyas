@@ -2,20 +2,6 @@
   padding-bottom: 4rem;
 }
 
-.nosotras-hero {
-  padding: 4rem 0;
-  text-align: center;
-  margin-bottom: 3rem;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  color: white;
-}
-
-.nosotras-hero h1 {
-  font-size: 3rem;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
 .nosotras-content {
   max-width: 800px;
   margin: 0 auto;
@@ -67,10 +53,6 @@
 }
 
 @media (max-width: 768px) {
-  .nosotras-hero h1 {
-    font-size: 2rem;
-  }
-  
   .about-card, .contact-card {
     padding: 2rem;
   }

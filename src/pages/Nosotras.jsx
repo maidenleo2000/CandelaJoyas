@@ -1,6 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { Send } from 'lucide-react';
+import PageHeader from '../components/common/PageHeader';
 import './Nosotras.css';
 
 export default function Nosotras() {
@@ -21,11 +22,7 @@ export default function Nosotras() {
 
   return (
     <div className="nosotras-page animate-fade-in">
-      <section className="nosotras-hero glass">
-        <div className="container">
-          <h1>{settings.aboutTitle || 'Nosotras'}</h1>
-        </div>
-      </section>
+      <PageHeader title={settings.aboutTitle || 'Nosotras'} />
 
       <section className="container nosotras-content">
         <div className="about-card glass">
