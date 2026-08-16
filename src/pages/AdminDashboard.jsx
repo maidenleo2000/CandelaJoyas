@@ -142,6 +142,8 @@ export default function AdminDashboard() {
     videoUrls: [],
     showSidebarCarousel: false,
     sidebarCarouselImages: [],
+    sidebarCarouselHeight: '220',
+    sidebarCarouselIntervalSeconds: '4.5',
     enableWhatsApp: true, // Default enabled
     enableMercadoPago: false, // Default disabled
     checkoutRequireName: true,
@@ -2108,6 +2110,44 @@ export default function AdminDashboard() {
                           <input type="file" accept="image/*" multiple onChange={handleSidebarImageUpload} disabled={isSidebarImageUploading} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
                           <UploadCloud size={24} strokeWidth={1.5} />
                           <span>{isSidebarImageUploading ? 'Subiendo imagen(es)...' : 'Subir nueva(s) imagen(es)'}</span>
+                        </div>
+                      </div>
+
+                      <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                        <label>Alto del carrusel (px): <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{siteSettings.sidebarCarouselHeight || '220'} px</span></label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                          <input
+                            type="range"
+                            name="sidebarCarouselHeight"
+                            min="100"
+                            max="500"
+                            step="10"
+                            value={siteSettings.sidebarCarouselHeight || '220'}
+                            onChange={handleSettingsChange}
+                            style={{ flex: 1 }}
+                          />
+                          <div style={{ padding: '4px 10px', background: '#f0f0f0', borderRadius: '4px', fontSize: '0.8rem', minWidth: '80px', textAlign: 'center' }}>
+                            {siteSettings.sidebarCarouselHeight || '220'} px
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                        <label>Tiempo entre imágenes (segundos): <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{siteSettings.sidebarCarouselIntervalSeconds || '4.5'}s</span></label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                          <input
+                            type="range"
+                            name="sidebarCarouselIntervalSeconds"
+                            min="1.5"
+                            max="15"
+                            step="0.5"
+                            value={siteSettings.sidebarCarouselIntervalSeconds || '4.5'}
+                            onChange={handleSettingsChange}
+                            style={{ flex: 1 }}
+                          />
+                          <div style={{ padding: '4px 10px', background: '#f0f0f0', borderRadius: '4px', fontSize: '0.8rem', minWidth: '80px', textAlign: 'center' }}>
+                            {siteSettings.sidebarCarouselIntervalSeconds || '4.5'}s
+                          </div>
                         </div>
                       </div>
                     </div>

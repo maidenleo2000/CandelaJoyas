@@ -166,7 +166,11 @@ export default function Home() {
     <div className="home-page animate-fade-in">
       {settings.showSidebarCarousel && settings.sidebarCarouselImages && settings.sidebarCarouselImages.length > 0 && (
         <div className="container" style={{ display: !searchTerm ? 'block' : 'none', paddingTop: '1rem' }}>
-          <SidebarCarousel images={settings.sidebarCarouselImages} />
+          <SidebarCarousel
+            images={settings.sidebarCarouselImages}
+            heightPx={settings.sidebarCarouselHeight}
+            intervalSeconds={settings.sidebarCarouselIntervalSeconds}
+          />
         </div>
       )}
 

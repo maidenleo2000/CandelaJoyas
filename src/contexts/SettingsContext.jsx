@@ -44,6 +44,8 @@ export default function SettingsProvider({ children }) {
     videoUrls: [],
     showSidebarCarousel: false,
     sidebarCarouselImages: [],
+    sidebarCarouselHeight: '220',
+    sidebarCarouselIntervalSeconds: '4.5',
     // Checkout Settings
     checkoutRequireName: true,
     checkoutRequirePhone: true,

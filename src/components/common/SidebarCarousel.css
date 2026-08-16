@@ -1,7 +1,7 @@
 .sidebar-carousel {
   position: relative;
   width: 100%;
-  height: 220px;
+  height: var(--sidebar-carousel-height, 220px);
   margin: 0 0 2rem;
   border-radius: 16px;
   overflow: hidden;
@@ -74,7 +74,7 @@
 
 @media (max-width: 768px) {
   .sidebar-carousel {
-    height: 150px;
+    height: min(var(--sidebar-carousel-height, 220px), 150px);
     border-radius: 12px;
     margin-bottom: 1.5rem;
   }

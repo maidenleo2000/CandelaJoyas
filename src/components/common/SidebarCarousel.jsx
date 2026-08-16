@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import './SidebarCarousel.css';
 
-const AUTO_ROTATE_MS = 4500;
+const DEFAULT_HEIGHT_PX = 220;
+const DEFAULT_INTERVAL_SECONDS = 4.5;
 
-export default function SidebarCarousel({ images }) {
+export default function SidebarCarousel({ images, heightPx, intervalSeconds }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const timerRef = useRef(null);
 
   const slides = Array.isArray(images) ? images.filter((img) => img?.url) : [];
+  const resolvedHeight = Number(heightPx) > 0 ? Number(heightPx) : DEFAULT_HEIGHT_PX;
+  const resolvedIntervalMs = (Number(intervalSeconds) > 0 ? Number(intervalSeconds) : DEFAULT_INTERVAL_SECONDS) * 1000;
 
   useEffect(() => {
     if (currentIndex >= slides.length) setCurrentIndex(0);
@@ -18,10 +21,10 @@ export default function SidebarCarousel({ images }) {
 
     timerRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % slides.length);
-    }, AUTO_ROTATE_MS);
+    }, resolvedIntervalMs);
 
     return () => clearInterval(timerRef.current);
-  }, [slides.length]);
+  }, [slides.length, resolvedIntervalMs]);
 
   if (slides.length === 0) return null;
 
@@ -31,7 +34,7 @@ export default function SidebarCarousel({ images }) {
   };
 
   return (
-    <div className="sidebar-carousel">
+    <div className="sidebar-carousel" style={{ '--sidebar-carousel-height': `${resolvedHeight}px` }}>
       <div className="sidebar-carousel-track">
         {slides.map((slide, index) => {
           const content = (
