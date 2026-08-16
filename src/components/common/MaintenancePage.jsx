@@ -17,16 +17,19 @@ export default function MaintenancePage() {
   const { settings } = useContext(SettingsContext);
   const { remainingMs, expired } = useMaintenanceStatus(settings);
 
+  const hasBackgroundImage = Boolean(settings.maintenanceBackgroundImage);
+
   const style = {
     '--maintenance-gradient-start': settings.primaryColor || '#D4A373',
     '--maintenance-gradient-end': settings.secondaryColor || '#FAEDCD',
+    ...(hasBackgroundImage && { backgroundImage: `url(${settings.maintenanceBackgroundImage})` }),
   };
 
   const showCountdown = remainingMs !== null && !expired;
   const { days, hours, minutes, seconds } = showCountdown ? formatRemaining(remainingMs) : {};
 
   return (
-    <div className="maintenance-page" style={style}>
+    <div className={`maintenance-page ${hasBackgroundImage ? 'has-bg-image' : ''}`} style={style}>
       <div className="maintenance-box">
         {settings.logoUrl && (
           <img src={settings.logoUrl} alt={settings.siteTitle} className="maintenance-logo" />

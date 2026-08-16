@@ -82,6 +82,7 @@ export default function SettingsProvider({ children }) {
     maintenanceMessage: 'Estamos realizando mejoras para ofrecerte una mejor experiencia. ¡Volvemos pronto!',
     maintenanceEndsAt: '',
     maintenanceAutoDisable: true,
+    maintenanceBackgroundImage: '',
   });
   const [loading, setLoading] = useState(true);
   const settingsRef = useRef(settings);

@@ -8,6 +8,25 @@
   background: linear-gradient(135deg, var(--maintenance-gradient-start), var(--maintenance-gradient-end));
 }
 
+.maintenance-page.has-bg-image {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.maintenance-page.has-bg-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.maintenance-page.has-bg-image .maintenance-box {
+  position: relative;
+  z-index: 1;
+}
+
 .maintenance-box {
   max-width: 520px;
   width: 100%;

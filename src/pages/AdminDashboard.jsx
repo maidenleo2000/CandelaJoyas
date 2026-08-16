@@ -168,9 +168,11 @@ export default function AdminDashboard() {
     maintenanceMessage: '',
     maintenanceEndsAt: '',
     maintenanceAutoDisable: true,
+    maintenanceBackgroundImage: '',
   });
   const [logoFile, setLogoFile] = useState(null);
   const [faviconFile, setFaviconFile] = useState(null);
+  const [maintenanceBgFile, setMaintenanceBgFile] = useState(null);
   const [isVideoUploading, setIsVideoUploading] = useState(false);
   const [isSidebarImageUploading, setIsSidebarImageUploading] = useState(false);
 
@@ -403,6 +405,25 @@ export default function AdminDashboard() {
     const localValue = e.target.value;
     const iso = localValue ? new Date(localValue).toISOString() : '';
     setSiteSettings(prev => ({ ...prev, maintenanceEndsAt: iso }));
+  };
+
+  const handleMaintenanceBgChange = (e) => {
+    if (e.target.files[0]) {
+      setMaintenanceBgFile(e.target.files[0]);
+    }
+  };
+
+  const handleRemoveMaintenanceBg = async () => {
+    if (siteSettings.maintenanceBackgroundImage && isStorageUrl(siteSettings.maintenanceBackgroundImage)) {
+      try {
+        await deleteFileByUrl(siteSettings.maintenanceBackgroundImage);
+      } catch (error) {
+        console.warn('No se pudo eliminar la imagen de fondo del Storage:', error);
+      }
+    }
+    setMaintenanceBgFile(null);
+    setSiteSettings(prev => ({ ...prev, maintenanceBackgroundImage: '' }));
+    toast.success('Imagen de fondo removida. Recordá "Guardar Cambios" para confirmar.');
   };
 
   const maintenanceStatus = useMaintenanceStatus(settings);
@@ -730,9 +751,15 @@ export default function AdminDashboard() {
         finalFaviconUrl = await uploadFile('settings', `favicon_${Date.now()}`, faviconFile);
       }
 
-      await updateSettings({ ...siteSettings, logoUrl: finalLogoUrl, faviconUrl: finalFaviconUrl });
+      let finalMaintenanceBgUrl = siteSettings.maintenanceBackgroundImage;
+      if (maintenanceBgFile) {
+        finalMaintenanceBgUrl = await uploadFile('settings', `maintenance_bg_${Date.now()}`, maintenanceBgFile);
+      }
+
+      await updateSettings({ ...siteSettings, logoUrl: finalLogoUrl, faviconUrl: finalFaviconUrl, maintenanceBackgroundImage: finalMaintenanceBgUrl });
       setLogoFile(null);
       setFaviconFile(null);
+      setMaintenanceBgFile(null);
     } catch (error) {
       console.error(error);
     } finally {
@@ -2737,6 +2764,38 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                     )}
+
+                    <div className="form-group" style={{ marginTop: '1rem' }}>
+                      <label>Imagen de Fondo (Opcional)</label>
+                      <div className="logo-upload-container">
+                        {siteSettings.maintenanceBackgroundImage && !maintenanceBgFile && (
+                          <div className="current-logo-preview">
+                            <img
+                              src={siteSettings.maintenanceBackgroundImage}
+                              alt="Fondo de mantenimiento actual"
+                              style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '8px' }}
+                            />
+                            <span>Fondo actual</span>
+                            <button
+                              type="button"
+                              onClick={handleRemoveMaintenanceBg}
+                              className="btn btn-outline"
+                              style={{ marginTop: '0.5rem', padding: '0.3rem 0.6rem', fontSize: '0.75rem', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
+                            >
+                              Quitar Imagen
+                            </button>
+                          </div>
+                        )}
+                        <div className="upload-box">
+                          <input type="file" accept="image/*" onChange={handleMaintenanceBgChange} />
+                          <UploadCloud size={24} strokeWidth={1.5} />
+                          <span>{maintenanceBgFile ? maintenanceBgFile.name : 'Subir imagen de fondo'}</span>
+                        </div>
+                      </div>
+                      <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: '5px' }}>
+                        Se muestra detrás del mensaje de mantenimiento, con una capa oscura para mantener el texto legible. Si no subís ninguna, se usa el degradé de colores de la marca.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
