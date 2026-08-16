@@ -6,6 +6,7 @@ import { SettingsContext } from '../contexts/SettingsContext';
 import { useSearch } from '../contexts/SearchContext';
 import { Filter, ChevronDown } from 'lucide-react';
 import VideoSlider from '../components/common/VideoSlider';
+import SidebarCarousel from '../components/common/SidebarCarousel';
 import './Home.css';
 
 export default function Home() {
@@ -163,6 +164,12 @@ export default function Home() {
 
   return (
     <div className="home-page animate-fade-in">
+      {settings.showSidebarCarousel && settings.sidebarCarouselImages && settings.sidebarCarouselImages.length > 0 && (
+        <div className="container" style={{ display: !searchTerm ? 'block' : 'none', paddingTop: '1rem' }}>
+          <SidebarCarousel images={settings.sidebarCarouselImages} />
+        </div>
+      )}
+
       {settings.showHero !== false && (
         <div style={{ display: !searchTerm ? 'block' : 'none' }}>
           <section className="hero">

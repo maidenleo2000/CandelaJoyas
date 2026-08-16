@@ -42,6 +42,8 @@ export default function SettingsProvider({ children }) {
     // Video Slider Settings
     showVideoSlider: false,
     videoUrls: [],
+    showSidebarCarousel: false,
+    sidebarCarouselImages: [],
     // Checkout Settings
     checkoutRequireName: true,
     checkoutRequirePhone: true,

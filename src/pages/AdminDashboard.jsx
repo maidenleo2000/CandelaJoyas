@@ -5,7 +5,7 @@ import { SettingsContext } from '../contexts/SettingsContext';
 import { supabase } from '../services/supabase';
 import { uploadFile, isStorageUrl, deleteFileByUrl } from '../services/storage';
 import toast from 'react-hot-toast';
-import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle } from 'lucide-react';
+import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle, GalleryHorizontal } from 'lucide-react';
 import { registerPush, unregisterPush } from '../services/pushNotifications';
 import { useProducts } from '../hooks/useProducts';
 import { useCategories } from '../hooks/useCategories';
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
   const { settings, updateSettings } = useContext(SettingsContext);
   
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'settings'
-  const [activeSettingsTab, setActiveSettingsTab] = useState('identity'); // 'identity', 'hero', 'marquee', 'videos', 'checkout', 'footer', 'about'
+  const [activeSettingsTab, setActiveSettingsTab] = useState('identity'); // 'identity', 'hero', 'marquee', 'videos', 'sidebar', 'checkout', 'footer', 'about'
   const location = useLocation();
 
   useEffect(() => {
@@ -140,6 +140,8 @@ export default function AdminDashboard() {
     catalogTitle: 'Catálogo',
     showVideoSlider: false,
     videoUrls: [],
+    showSidebarCarousel: false,
+    sidebarCarouselImages: [],
     enableWhatsApp: true, // Default enabled
     enableMercadoPago: false, // Default disabled
     checkoutRequireName: true,
@@ -156,6 +158,7 @@ export default function AdminDashboard() {
   const [logoFile, setLogoFile] = useState(null);
   const [faviconFile, setFaviconFile] = useState(null);
   const [isVideoUploading, setIsVideoUploading] = useState(false);
+  const [isSidebarImageUploading, setIsSidebarImageUploading] = useState(false);
 
   const handleFaviconChange = (e) => {
     const file = e.target.files[0];
@@ -212,6 +215,9 @@ export default function AdminDashboard() {
       }
       if (!normalizedSettings.videoUrls) {
         normalizedSettings.videoUrls = [];
+      }
+      if (!normalizedSettings.sidebarCarouselImages) {
+        normalizedSettings.sidebarCarouselImages = [];
       }
       setSiteSettings(normalizedSettings);
     }
@@ -309,6 +315,59 @@ export default function AdminDashboard() {
         return { ...prev, videoUrls: newUrls };
     });
     toast.success('Video removido. Recordá "Guardar Cambios" para confirmar.');
+  };
+
+  const handleSidebarImageUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    setIsSidebarImageUploading(true);
+    try {
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        const timestamp = Date.now();
+        const fileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+        const url = await uploadFile('settings', `sidebar_${timestamp}_${fileName}`, file);
+
+        setSiteSettings(prev => ({
+          ...prev,
+          sidebarCarouselImages: [...(prev.sidebarCarouselImages || []), { url, linkUrl: '' }]
+        }));
+      }
+      toast.success('Imagen(es) subida(s) exitosamente.');
+    } catch (error) {
+      console.error('Error de subida:', error);
+      toast.error('Error: Fallo la conexión, no tenés permisos o el archivo es incompatible.');
+    } finally {
+      setIsSidebarImageUploading(false);
+    }
+  };
+
+  const handleSidebarImageRemove = async (index) => {
+    const image = siteSettings.sidebarCarouselImages[index];
+
+    if (image?.url && isStorageUrl(image.url)) {
+      try {
+        await deleteFileByUrl(image.url);
+      } catch (error) {
+        console.warn('No se pudo eliminar el archivo de Storage (tal vez ya no existe o es externo):', error);
+      }
+    }
+
+    setSiteSettings(prev => {
+      const newImages = [...(prev.sidebarCarouselImages || [])];
+      newImages.splice(index, 1);
+      return { ...prev, sidebarCarouselImages: newImages };
+    });
+    toast.success('Imagen removida. Recordá "Guardar Cambios" para confirmar.');
+  };
+
+  const handleSidebarImageLinkChange = (index, linkUrl) => {
+    setSiteSettings(prev => {
+      const newImages = [...(prev.sidebarCarouselImages || [])];
+      newImages[index] = { ...newImages[index], linkUrl };
+      return { ...prev, sidebarCarouselImages: newImages };
+    });
   };
 
   const handleSettingsChange = (e) => {
@@ -1590,6 +1649,7 @@ export default function AdminDashboard() {
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'hero' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('hero')}><Layout size={16} /> Inicio</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'marquee' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('marquee')}><Megaphone size={16} /> Marquesina</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'videos' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('videos')}><Video size={16} /> Videos</button>
+            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'sidebar' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('sidebar')}><GalleryHorizontal size={16} /> Sidebar</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'checkout' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('checkout')}><ClipboardCheck size={16} /> Checkout</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'footer' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('footer')}><Link size={16} /> Footer</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'about' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('about')}><User size={16} /> Nosotras</button>
@@ -1995,6 +2055,59 @@ export default function AdminDashboard() {
                           <input type="file" accept="video/*" onChange={handleVideoUpload} disabled={isVideoUploading} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
                           <UploadCloud size={24} strokeWidth={1.5} />
                           <span>{isVideoUploading ? 'Subiendo video (esto puede tardar unos minutos)...' : 'Subir nuevo video (.mp4)'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeSettingsTab === 'sidebar' && (
+              <div className="animate-fade-in">
+                <div className="settings-section">
+                  <h3><GalleryHorizontal size={18} /> Carrusel debajo del Header</h3>
+                  <p className="text-muted" style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>Estas imágenes rotan en un carrusel que aparece en el Inicio, justo debajo del encabezado.</p>
+
+                  <div className="form-group checkbox-group">
+                    <label className="checkbox-label" style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                      <input
+                        type="checkbox"
+                        name="showSidebarCarousel"
+                        checked={siteSettings.showSidebarCarousel}
+                        onChange={handleSettingsChange}
+                      />
+                      Habilitar esta sección en la tienda
+                    </label>
+                  </div>
+
+                  {siteSettings.showSidebarCarousel && (
+                    <div style={{ padding: '1rem', background: 'rgba(0,0,0,0.02)', borderRadius: '8px', border: '1px solid #eee' }}>
+                      <div className="form-group">
+                        <label>Imágenes del carrusel</label>
+                        {(!siteSettings.sidebarCarouselImages || siteSettings.sidebarCarouselImages.length === 0) && (
+                          <p className="text-muted" style={{ fontSize: '0.85rem' }}>Aún no hay imágenes agregadas.</p>
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px', marginBottom: '15px' }}>
+                          {(siteSettings.sidebarCarouselImages || []).map((image, index) => (
+                            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#fff', padding: '10px', borderRadius: '6px', border: '1px solid #dee2e6' }}>
+                              <img src={image.url} style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} alt="" />
+                              <input
+                                type="text"
+                                value={image.linkUrl || ''}
+                                onChange={(e) => handleSidebarImageLinkChange(index, e.target.value)}
+                                placeholder="Link opcional al hacer click (https://...)"
+                                style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: '1px solid #ddd', fontSize: '0.85rem' }}
+                              />
+                              <button type="button" onClick={() => handleSidebarImageRemove(index)} className="btn btn-outline" style={{ padding: '5px 10px', color: 'red', borderColor: 'red' }}>Eliminar</button>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="upload-box" style={{ width: '100%', height: '100px', margin: 0, opacity: isSidebarImageUploading ? 0.6 : 1, position: 'relative', background: '#fff', border: '2px dashed #ccc', borderRadius: '8px' }}>
+                          <input type="file" accept="image/*" multiple onChange={handleSidebarImageUpload} disabled={isSidebarImageUploading} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }} />
+                          <UploadCloud size={24} strokeWidth={1.5} />
+                          <span>{isSidebarImageUploading ? 'Subiendo imagen(es)...' : 'Subir nueva(s) imagen(es)'}</span>
                         </div>
                       </div>
                     </div>
