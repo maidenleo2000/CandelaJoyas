@@ -179,10 +179,10 @@ export default function Home() {
           <section className="hero">
             <div className="hero-content">
               <h1 style={{ fontSize: `${settings.heroTitleSize || '1.5'}rem` }}>
-                {settings.heroTitle || 'Moda Inclusiva en Talles Reales'}
+                {settings.heroTitle || 'Joyas para cada ocasión'}
               </h1>
               <p style={{ fontSize: `${settings.heroSubtitleSize || '1'}rem` }}>
-                {settings.heroSubtitle || 'Descubre diseños exclusivos pensados para realzar tu belleza.'}
+                {settings.heroSubtitle || 'Encontrá joyas para cada ocasión y brillá en cada momento.'}
               </p>
               <button 
                 className="btn btn-primary"
