@@ -132,6 +132,12 @@ export default function Footer() {
       </div>
       <div className="footer-bottom">
         <p>&copy; {new Date().getFullYear()} {settings.siteTitle || 'Boutique Femme'}. Todos los derechos reservados.</p>
+        <p className="footer-credit">
+          Sitio web realizado por{' '}
+          <a href="https://leandromartello.com.ar" target="_blank" rel="noopener noreferrer">
+            leandromartello.com.ar
+          </a>
+        </p>
       </div>
 
       <ConfirmModal 

@@ -178,3 +178,18 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-muted);
 }
+
+.footer-credit {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.footer-credit a {
+  color: var(--text-muted);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.footer-credit a:hover {
+  color: var(--text-color, #fff);
+}
