@@ -52,11 +52,11 @@ export default function AuthProvider({ children }) {
   // handle_new_user() en la base de datos ignora cualquier role que
   // venga del cliente y siempre asigna 'client' (salvo emails admin
   // hardcodeados), así que no hay forma de auto-otorgarse admin.
-  const register = async (email, password, displayName) => {
+  const register = async (email, password, displayName, captchaToken) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName || '' } }
+      options: { data: { display_name: displayName || '' }, captchaToken }
     });
     if (error) throw error;
     // Si el email ya tiene una cuenta, Supabase Auth no devuelve error (para

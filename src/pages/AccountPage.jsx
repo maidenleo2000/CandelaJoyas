@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import { saleFromRow, ORDER_STATUS_STEPS } from '../utils/salesMapper';
+import Turnstile from '../components/Turnstile';
 import toast from 'react-hot-toast';
 import { User, Lock, Key, LogOut, Package, Truck, Calendar, CheckCircle, Clock, XCircle, ExternalLink, MailCheck } from 'lucide-react';
 import '../pages/SalesTab.css';
@@ -98,6 +99,10 @@ export default function AccountPage() {
   const [loadingSales, setLoadingSales] = useState(true);
   const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState('');
 
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+
   useEffect(() => {
     document.title = 'Mi Cuenta';
   }, []);
@@ -169,9 +174,13 @@ export default function AccountPage() {
       toast.error('Las contraseñas no coinciden');
       return;
     }
+    if (turnstileSiteKey && !captchaToken) {
+      toast.error('Completá la verificación anti-bots antes de continuar.');
+      return;
+    }
     setIsSubmitting(true);
     try {
-      const result = await register(email, password, displayName);
+      const result = await register(email, password, displayName, captchaToken);
       if (!result?.session) {
         // El proyecto tiene "Confirm email" activado: se crea el usuario
         // pero no hay sesión hasta que confirme el link del mail.
@@ -183,6 +192,9 @@ export default function AccountPage() {
     } catch (error) {
       console.error(error);
       toast.error(error.message || 'Error al crear la cuenta.');
+      // El token de Turnstile es de un solo uso: pedimos uno nuevo para el próximo intento.
+      setCaptchaToken('');
+      setCaptchaResetKey(k => k + 1);
     } finally {
       setIsSubmitting(false);
     }
@@ -275,7 +287,15 @@ export default function AccountPage() {
                 <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
                 <input type="password" placeholder="Contraseña (mínimo 6 caracteres)" value={password} onChange={e => setPassword(e.target.value)} required />
                 <input type="password" placeholder="Repetir contraseña" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
-                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                {turnstileSiteKey && (
+                  <Turnstile
+                    siteKey={turnstileSiteKey}
+                    resetKey={captchaResetKey}
+                    onVerify={setCaptchaToken}
+                    onExpire={() => setCaptchaToken('')}
+                  />
+                )}
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting || (!!turnstileSiteKey && !captchaToken)}>
                   {isSubmitting ? 'Creando cuenta...' : 'Crear Cuenta'}
                 </button>
               </form>
