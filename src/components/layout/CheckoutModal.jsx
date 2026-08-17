@@ -1,7 +1,9 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { SettingsContext } from '../../contexts/SettingsContext';
-import { MessageCircle, CreditCard, Clock, Loader2 } from 'lucide-react';
+import { AuthContext } from '../../contexts/AuthContext';
+import { MessageCircle, CreditCard, Clock, Loader2, UserPlus } from 'lucide-react';
 import { quoteCorreoEnvio } from '../../services/shipping';
+import { toast } from 'react-hot-toast';
 import '../common/ConfirmModal.css'; // Reuse basic modal overlay styles
 
 const ARGENTINA_PROVINCES = [
@@ -13,6 +15,7 @@ const ARGENTINA_PROVINCES = [
 
 export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmitting }) {
   const { settings } = useContext(SettingsContext);
+  const { currentUser } = useContext(AuthContext);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
@@ -21,6 +24,12 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
   const [emailError, setEmailError] = useState('');
   const [selectedMethod, setSelectedMethod] = useState(null); // 'whatsapp' or 'mercadopago'
   const [shippingMethod, setShippingMethod] = useState('coordinate'); // 'coordinate', 'mercadoenvios' or 'correoargentino'
+
+  // Crear cuenta al comprar como invitado (para poder hacer seguimiento del pedido después)
+  const [wantAccount, setWantAccount] = useState(false);
+  const [accountPassword, setAccountPassword] = useState('');
+  const [accountPasswordConfirm, setAccountPasswordConfirm] = useState('');
+  const [accountError, setAccountError] = useState('');
 
   // Address fields for shipping
   const [address, setAddress] = useState({
@@ -106,15 +115,28 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
       hasError = true;
     }
 
-    if (selectedMethod === 'mercadopago') {
+    const emailRequired = selectedMethod === 'mercadopago' || wantAccount;
+    if (emailRequired) {
       if (!customerEmail.trim()) {
-        setEmailError('El email es obligatorio para pagos con Mercado Pago');
+        setEmailError(selectedMethod === 'mercadopago' ? 'El email es obligatorio para pagos con Mercado Pago' : 'El email es obligatorio para crear tu cuenta');
         hasError = true;
       } else if (!/^\S+@\S+\.\S+$/.test(customerEmail)) {
         setEmailError('Ingresa un email válido');
         hasError = true;
       }
+    }
 
+    if (!currentUser && wantAccount) {
+      if (!accountPassword || accountPassword.length < 6) {
+        setAccountError('La contraseña debe tener al menos 6 caracteres');
+        hasError = true;
+      } else if (accountPassword !== accountPasswordConfirm) {
+        setAccountError('Las contraseñas no coinciden');
+        hasError = true;
+      }
+    }
+
+    if (selectedMethod === 'mercadopago') {
       // Validate address if Mercado Envios or Correo Argentino is selected
       if (shippingMethod === 'mercadoenvios') {
         if (!address.street || !address.number || !address.zip || !address.city) {
@@ -144,11 +166,13 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
     onConfirm({
       customerName,
       customerPhone,
-      customerEmail: selectedMethod === 'mercadopago' ? customerEmail : '',
+      customerEmail: emailRequired ? customerEmail : '',
       paymentMethod: selectedMethod,
       shippingMethod: finalShippingMethod,
       address: (finalShippingMethod === 'mercadoenvios' || finalShippingMethod === 'correoargentino') ? address : null,
-      shippingQuote: finalShippingMethod === 'correoargentino' ? correoQuote : null
+      shippingQuote: finalShippingMethod === 'correoargentino' ? correoQuote : null,
+      createAccount: !currentUser && wantAccount,
+      accountPassword: (!currentUser && wantAccount) ? accountPassword : undefined
     });
   };
 
@@ -212,13 +236,13 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
             {phoneError && <small style={{ color: '#ff4d4d', marginTop: '0.3rem', display: 'block' }}>{phoneError}</small>}
           </div>
 
-          {selectedMethod === 'mercadopago' && (
+          {(selectedMethod === 'mercadopago' || wantAccount) && (
             <div className="form-group animate-fade-in" style={{ marginBottom: '2rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
                 Email de contacto *
               </label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 className={emailError ? 'error' : ''}
                 value={customerEmail}
                 onChange={(e) => {
@@ -235,9 +259,51 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
                 }}
               />
               <small style={{ color: 'var(--text-muted)', marginTop: '0.3rem', display: 'block', fontSize: '0.8rem' }}>
-                Te enviaremos el comprobante y detalles del envío a esta dirección.
+                {selectedMethod === 'mercadopago'
+                  ? 'Te enviaremos el comprobante y detalles del envío a esta dirección.'
+                  : 'La usaremos para crear tu cuenta y que puedas seguir tu pedido.'}
               </small>
               {emailError && <small style={{ color: '#ff4d4d', marginTop: '0.3rem', display: 'block' }}>{emailError}</small>}
+            </div>
+          )}
+
+          {!currentUser && (
+            <div className="form-group animate-fade-in" style={{ marginBottom: '2rem', padding: '1rem', borderRadius: '12px', border: '1px solid #eee', background: '#fafafa' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: 600 }}>
+                <input
+                  type="checkbox"
+                  checked={wantAccount}
+                  onChange={(e) => {
+                    setWantAccount(e.target.checked);
+                    setAccountError('');
+                  }}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                />
+                <UserPlus size={18} /> Crear una cuenta para hacer seguimiento de este pedido
+              </label>
+
+              {wantAccount && (
+                <div className="animate-fade-in" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  <small style={{ color: 'var(--text-muted)' }}>
+                    Te vamos a enviar un email de confirmación para activar la cuenta.
+                  </small>
+                  <input
+                    type="password"
+                    placeholder="Contraseña (mínimo 6 caracteres)"
+                    value={accountPassword}
+                    onChange={(e) => { setAccountPassword(e.target.value); setAccountError(''); }}
+                    style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}
+                  />
+                  <input
+                    type="password"
+                    placeholder="Repetir contraseña"
+                    value={accountPasswordConfirm}
+                    onChange={(e) => { setAccountPasswordConfirm(e.target.value); setAccountError(''); }}
+                    style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}
+                  />
+                  {accountError && <small style={{ color: '#ff4d4d' }}>{accountError}</small>}
+                </div>
+              )}
             </div>
           )}
 

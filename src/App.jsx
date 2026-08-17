@@ -11,6 +11,7 @@ import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import AdminDashboard from './pages/AdminDashboard';
 import AccountPage from './pages/AccountPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import Nosotras from './pages/Nosotras';
 import HowToBuy from './pages/HowToBuy';
 import AdminGuide from './pages/AdminGuide';
@@ -45,6 +46,7 @@ function AppShell() {
           <Route path="/admin/guia" element={<AdminGuide />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/mi-cuenta" element={<AccountPage />} />
+          <Route path="/restablecer-contrasena" element={<ResetPasswordPage />} />
           <Route path="/nosotras" element={<Nosotras />} />
           <Route path="/como-comprar" element={<HowToBuy />} />
           <Route path="/success" element={<SuccessPage />} />

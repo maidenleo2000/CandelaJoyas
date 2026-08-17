@@ -73,6 +73,7 @@ export default function SalesTab() {
       try {
         const { error } = await supabase.from('sales').delete().eq('id', id);
         if (error) throw error;
+        setSales(prev => prev.filter(s => s.id !== id));
         toast.success("Venta eliminada correctamente");
       } catch (error) {
         toast.error("Error al eliminar la venta");
@@ -106,6 +107,15 @@ export default function SalesTab() {
         updated_at: new Date().toISOString(),
       }).eq('id', selectedSale.id);
       if (error) throw error;
+      setSales(prev => prev.map(s => s.id === selectedSale.id ? {
+        ...s,
+        customerName: editFormData.customerName,
+        customerPhone: editFormData.customerPhone,
+        status: editFormData.status,
+        trackingNumber: editFormData.trackingNumber || null,
+        trackingCarrier: editFormData.trackingCarrier || null,
+        trackingUrl: editFormData.trackingUrl || null,
+      } : s));
       toast.success("Venta actualizada correctamente");
       setIsEditing(false);
       setSelectedSale(null);
@@ -149,6 +159,7 @@ export default function SalesTab() {
           }).eq('id', id);
           if (error) throw error;
 
+          setSales(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
           toast.success("Estado actualizado y stock descontado");
           return;
         }
@@ -159,6 +170,7 @@ export default function SalesTab() {
         updated_at: new Date().toISOString(),
       }).eq('id', id);
       if (error) throw error;
+      setSales(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
       toast.success("Estado actualizado");
     } catch (error) {
       console.error("Error updating sale status:", error);

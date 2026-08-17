@@ -19,7 +19,7 @@ export default function CartDrawer({ isOpen, onClose }) {
     clearCart
   } = useContext(CartContext);
   const { settings } = useContext(SettingsContext);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, register } = useContext(AuthContext);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -61,6 +61,26 @@ export default function CartDrawer({ isOpen, onClose }) {
         }
       }
 
+      // 1.5. Si el comprador invitado eligió crear una cuenta al pagar,
+      // la registramos antes de guardar la venta para poder vincularla.
+      // Si falla (ej: el email ya tiene cuenta), el pedido igual continúa
+      // como invitado: crear la cuenta nunca debe bloquear la compra.
+      let effectiveUserId = currentUser?.id || null;
+      if (!currentUser && customerData.createAccount && customerData.accountPassword) {
+        try {
+          const signUpResult = await register(customerData.customerEmail, customerData.accountPassword, customerData.customerName);
+          effectiveUserId = signUpResult?.user?.id || null;
+          if (effectiveUserId && signUpResult?.session) {
+            toast.success('¡Cuenta creada! Vas a poder seguir este pedido desde "Mi Cuenta".');
+          } else if (effectiveUserId) {
+            toast.success('¡Cuenta creada! Confirmá el email que te enviamos para poder iniciar sesión y seguir este pedido.', { duration: 6000 });
+          }
+        } catch (regError) {
+          console.error('Error creando cuenta en el checkout:', regError);
+          toast.error('No pudimos crear tu cuenta (puede que el email ya esté registrado). Tu pedido va a continuar igual.');
+        }
+      }
+
       // 2. Guardar la venta (limpiamos datos para evitar undefined)
       // Generamos el id en el cliente: un visitante anónimo puede insertar
       // la venta (RLS lo permite) pero no puede leerla de vuelta con
@@ -68,7 +88,7 @@ export default function CartDrawer({ isOpen, onClose }) {
       const saleId = crypto.randomUUID();
       const saleData = {
         id: saleId,
-        user_id: currentUser?.id || null,
+        user_id: effectiveUserId,
         customer_name: customerData.customerName || 'Cliente',
         customer_phone: customerData.customerPhone || 'No proporcionado',
         customer_email: customerData.customerEmail || '',

@@ -4,7 +4,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import { saleFromRow, ORDER_STATUS_STEPS } from '../utils/salesMapper';
 import toast from 'react-hot-toast';
-import { User, Lock, Key, LogOut, Package, Truck, Calendar, CheckCircle, Clock, XCircle, ExternalLink } from 'lucide-react';
+import { User, Lock, Key, LogOut, Package, Truck, Calendar, CheckCircle, Clock, XCircle, ExternalLink, MailCheck } from 'lucide-react';
 import '../pages/SalesTab.css';
 import './AccountPage.css';
 
@@ -85,9 +85,9 @@ function OrderCard({ sale }) {
 
 export default function AccountPage() {
   const navigate = useNavigate();
-  const { currentUser, login, register, logout, changePassword } = useContext(AuthContext);
+  const { currentUser, userRole, login, register, logout, changePassword, resetPassword } = useContext(AuthContext);
 
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'forgot'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -96,10 +96,17 @@ export default function AccountPage() {
 
   const [sales, setSales] = useState([]);
   const [loadingSales, setLoadingSales] = useState(true);
+  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState('');
 
   useEffect(() => {
     document.title = 'Mi Cuenta';
   }, []);
+
+  useEffect(() => {
+    if (currentUser && userRole === 'admin') {
+      navigate('/admin', { replace: true });
+    }
+  }, [currentUser, userRole, navigate]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -164,8 +171,15 @@ export default function AccountPage() {
     }
     setIsSubmitting(true);
     try {
-      await register(email, password, displayName);
-      toast.success('¡Cuenta creada correctamente!');
+      const result = await register(email, password, displayName);
+      if (!result?.session) {
+        // El proyecto tiene "Confirm email" activado: se crea el usuario
+        // pero no hay sesión hasta que confirme el link del mail.
+        setPendingConfirmationEmail(email);
+        toast.success('¡Cuenta creada! Revisá tu email para confirmarla.');
+      } else {
+        toast.success('¡Cuenta creada correctamente!');
+      }
     } catch (error) {
       console.error(error);
       toast.error(error.message || 'Error al crear la cuenta.');
@@ -179,16 +193,60 @@ export default function AccountPage() {
     navigate('/');
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await resetPassword(email);
+      toast.success('Te enviamos un email con un link para restablecer tu contraseña.');
+      setMode('login');
+    } catch (error) {
+      console.error(error);
+      if (error.message?.toLowerCase().includes('rate limit')) {
+        toast.error('Se enviaron demasiados emails. Esperá unos minutos e intentá de nuevo.');
+      } else {
+        toast.error(error.message || 'Error al enviar el email de recuperación.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!currentUser) {
+    if (pendingConfirmationEmail) {
+      return (
+        <div className="account-login-container animate-fade-in">
+          <div className="account-login-box glass">
+            <MailCheck size={40} style={{ color: 'var(--color-primary)', marginBottom: '1rem' }} />
+            <h2>Confirmá tu cuenta</h2>
+            <p>
+              Te enviamos un email de confirmación a <strong>{pendingConfirmationEmail}</strong>.
+              Abrí el link que te llegó para activar tu cuenta y después iniciá sesión acá.
+            </p>
+            <button
+              type="button"
+              className="btn btn-outline"
+              style={{ width: '100%' }}
+              onClick={() => { setPendingConfirmationEmail(''); setMode('login'); }}
+            >
+              Ya confirmé, iniciar sesión
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="account-login-container animate-fade-in">
         <div className="account-login-box glass">
-          <div className="account-mode-tabs">
-            <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>Ingresar</button>
-            <button className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')}>Crear Cuenta</button>
-          </div>
+          {mode !== 'forgot' && (
+            <div className="account-mode-tabs">
+              <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>Ingresar</button>
+              <button className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')}>Crear Cuenta</button>
+            </div>
+          )}
 
-          {mode === 'login' ? (
+          {mode === 'login' && (
             <>
               <h2>Mi Cuenta</h2>
               <p>Ingresá para ver el estado de tus pedidos.</p>
@@ -199,11 +257,19 @@ export default function AccountPage() {
                   {isSubmitting ? 'Ingresando...' : 'Iniciar Sesión'}
                 </button>
               </form>
+              <button type="button" className="account-forgot-link" onClick={() => setMode('forgot')}>
+                ¿Olvidaste tu contraseña?
+              </button>
             </>
-          ) : (
+          )}
+
+          {mode === 'register' && (
             <>
               <h2>Crear Cuenta</h2>
               <p>Registrate para hacer seguimiento de tus pedidos.</p>
+              <div className="account-confirm-notice">
+                <MailCheck size={16} /> Te vamos a enviar un email de confirmación para activar la cuenta.
+              </div>
               <form onSubmit={handleRegister} className="login-form">
                 <input type="text" placeholder="Nombre y apellido" value={displayName} onChange={e => setDisplayName(e.target.value)} required />
                 <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
@@ -213,6 +279,22 @@ export default function AccountPage() {
                   {isSubmitting ? 'Creando cuenta...' : 'Crear Cuenta'}
                 </button>
               </form>
+            </>
+          )}
+
+          {mode === 'forgot' && (
+            <>
+              <h2>Recuperar Contraseña</h2>
+              <p>Ingresá tu email y te enviamos un link para restablecerla.</p>
+              <form onSubmit={handleForgotPassword} className="login-form">
+                <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? 'Enviando...' : 'Enviar Link'}
+                </button>
+              </form>
+              <button type="button" className="account-forgot-link" onClick={() => setMode('login')}>
+                Volver a iniciar sesión
+              </button>
             </>
           )}
         </div>

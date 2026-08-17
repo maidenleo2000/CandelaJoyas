@@ -59,7 +59,23 @@ export default function AuthProvider({ children }) {
       options: { data: { display_name: displayName || '' } }
     });
     if (error) throw error;
+    // Si el email ya tiene una cuenta, Supabase Auth no devuelve error (para
+    // no filtrar qué emails existen): responde con un user "ofuscado" cuyo id
+    // no es una fila real de auth.users (identities viene vacío). Si no
+    // detectamos esto, ese id termina usándose como FK en otras tablas.
+    if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      throw new Error('Este email ya tiene una cuenta. Iniciá sesión en su lugar.');
+    }
     return data;
+  };
+
+  // Envía el email de recuperación de contraseña con un link que redirige
+  // a /restablecer-contrasena, donde Supabase deja una sesión temporal.
+  const resetPassword = async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/restablecer-contrasena`
+    });
+    if (error) throw error;
   };
 
   // Log Out function
@@ -130,7 +146,8 @@ export default function AuthProvider({ children }) {
     login,
     register,
     logout,
-    changePassword
+    changePassword,
+    resetPassword
   };
 
   return (

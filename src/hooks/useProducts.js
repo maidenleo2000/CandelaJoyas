@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 
-function fromRow(row) {
+export function fromRow(row) {
   return {
     id: row.id,
     name: row.name,
@@ -73,5 +73,5 @@ export function useProducts() {
     setLoading(false);
   };
 
-  return { products, loading, error, refetch };
+  return { products, loading, error, refetch, setProducts };
 }

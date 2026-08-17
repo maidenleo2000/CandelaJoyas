@@ -93,6 +93,11 @@ export default function UsersTab() {
           updated_at: new Date().toISOString(),
         }).eq('id', selectedUser.id);
         if (error) throw error;
+        setUsers(prev => prev.map(u => u.id === selectedUser.id ? {
+          ...u,
+          displayName: formData.displayName,
+          role: formData.role,
+        } : u));
         toast.success("Usuario actualizado correctamente");
       } else {
         // Crear usuario vía Edge Function (usa el service role, no puede
@@ -108,6 +113,13 @@ export default function UsersTab() {
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
 
+        setUsers(prev => [{
+          id: data.id,
+          email: formData.email,
+          displayName: formData.displayName,
+          role: formData.role,
+          createdAt: new Date(),
+        }, ...prev]);
         toast.success("Usuario creado exitosamente");
       }
       setIsModalOpen(false);
@@ -121,13 +133,17 @@ export default function UsersTab() {
   };
 
   const handleDelete = async (id, userEmail) => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar permanentemente a ${userEmail}? \n(Nota: Esto elimina el perfil pero la cuenta de Auth debe borrarse manualmente desde el panel de Supabase)`)) {
+    if (window.confirm(`¿Estás seguro de que deseas eliminar permanentemente a ${userEmail}?`)) {
       try {
-        const { error } = await supabase.from('profiles').delete().eq('id', id);
+        const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+          body: { id },
+        });
         if (error) throw error;
-        toast.success("Perfil de usuario eliminado");
+        if (data?.error) throw new Error(data.error);
+        setUsers(prev => prev.filter(u => u.id !== id));
+        toast.success("Usuario eliminado correctamente");
       } catch (error) {
-        toast.error("Error al eliminar el usuario");
+        toast.error(error.message || "Error al eliminar el usuario");
       }
     }
   };

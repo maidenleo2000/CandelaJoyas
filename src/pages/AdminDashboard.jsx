@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle, GalleryHorizontal, Truck, Wrench } from 'lucide-react';
 import { useMaintenanceStatus } from '../hooks/useMaintenanceStatus';
 import { registerPush, unregisterPush } from '../services/pushNotifications';
-import { useProducts } from '../hooks/useProducts';
+import { useProducts, fromRow as productFromRow } from '../hooks/useProducts';
 import { useCategories } from '../hooks/useCategories';
 import SalesTab from './SalesTab';
 import EnviosTab from './EnviosTab';
@@ -67,8 +67,8 @@ const processImage = (file, maxWidth, quality = 0.85) => {
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { currentUser, userRole, userData, updateUserData, login, logout, changePassword } = useContext(AuthContext);
-  const { products, loading: productsLoading, refetch: refetchProducts } = useProducts();
-  const { categories, loading: categoriesLoading } = useCategories();
+  const { products, loading: productsLoading, refetch: refetchProducts, setProducts } = useProducts();
+  const { categories, loading: categoriesLoading, setCategories } = useCategories();
   const { settings, updateSettings } = useContext(SettingsContext);
   
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'settings'
@@ -583,8 +583,8 @@ export default function AdminDashboard() {
 
         const { error: deleteError } = await supabase.from('products').delete().eq('id', id);
         if (deleteError) throw deleteError;
+        setProducts(prev => prev.filter(p => p.id !== id));
         toast.success("Producto e imágenes eliminados correctamente");
-        refetchProducts();
       } catch(e) {
         console.error(e);
         toast.error("Error eliminando producto");
@@ -662,6 +662,8 @@ export default function AdminDashboard() {
             if (updateError) {
               console.error("Error guardando nueva categoría en settings:", updateError);
               toast.error(`No se pudo crear la categoría "${finalCategory}" en el listado global. El producto se guardará con esa categoría de todos modos.`);
+            } else {
+              setCategories(prev => [...prev, newCategory]);
             }
           }
         }
@@ -719,16 +721,17 @@ export default function AdminDashboard() {
         }
 
         // Actualizar en la base de datos
-        const { error } = await supabase.from('products').update(formattedData).eq('id', currentId);
+        const { data: updatedRow, error } = await supabase.from('products').update(formattedData).eq('id', currentId).select().single();
         if (error) throw error;
+        setProducts(prev => prev.map(p => p.id === currentId ? productFromRow(updatedRow) : p));
         toast.success("Producto actualizado correctamente");
       } else {
         // Nuevo producto
-        const { error } = await supabase.from('products').insert(formattedData);
+        const { data: newRow, error } = await supabase.from('products').insert(formattedData).select().single();
         if (error) throw error;
+        setProducts(prev => [productFromRow(newRow), ...prev]);
         toast.success("¡Producto agregado a tu tienda!");
       }
-      await refetchProducts();
       resetForm();
     } catch (e) {
       console.error("Error completo:", e);

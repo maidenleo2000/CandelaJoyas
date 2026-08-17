@@ -7,8 +7,8 @@ import toast from 'react-hot-toast';
 import './CategoryManager.css';
 
 export default function CategoryManager() {
-  const { categories, loading } = useCategories();
-  const { products } = useProducts();
+  const { categories, loading, setCategories } = useCategories();
+  const { products, setProducts } = useProducts();
   const [newCategoryName, setNewCategoryName] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState('');
@@ -48,6 +48,7 @@ export default function CategoryManager() {
 
       await updateCategories([...categories, newCategory]);
 
+      setCategories(prev => [...prev, newCategory]);
       setNewCategoryName('');
       toast.success('Categoría agregada');
     } catch (error) {
@@ -90,12 +91,14 @@ export default function CategoryManager() {
       );
 
       await updateCategories(updatedCategories);
+      setCategories(updatedCategories);
 
       // Update all products with this category
       const productsToUpdate = products.filter(p => p.category === oldName);
       if (productsToUpdate.length > 0) {
         const { error } = await supabase.from('products').update({ category: newName }).eq('category', oldName);
         if (error) throw error;
+        setProducts(prev => prev.map(p => p.category === oldName ? { ...p, category: newName } : p));
         toast.success(`Categoría actualizada y ${productsToUpdate.length} productos vinculados`);
       } else {
         toast.success('Categoría actualizada');
@@ -124,11 +127,13 @@ export default function CategoryManager() {
         // Remove from categories array in settings
         const updatedCategories = categories.filter(cat => cat.id !== category.id);
         await updateCategories(updatedCategories);
+        setCategories(updatedCategories);
 
         // Update products to have no category
         if (productsInCategory.length > 0) {
           const { error } = await supabase.from('products').update({ category: '' }).eq('category', category.name);
           if (error) throw error;
+          setProducts(prev => prev.map(p => p.category === category.name ? { ...p, category: '' } : p));
           toast.success('Categoría eliminada y productos desvinculados');
         } else {
           toast.success('Categoría eliminada');
@@ -160,6 +165,7 @@ export default function CategoryManager() {
 
       if (newCatsToImport.length > 0) {
         await updateCategories([...categories, ...newCatsToImport]);
+        setCategories(prev => [...prev, ...newCatsToImport]);
         toast.success(`${newCatsToImport.length} categorías importadas correctamente`);
       } else {
         toast.success('Todas las categorías ya estaban importadas');

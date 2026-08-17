@@ -47,5 +47,5 @@ export function useCategories() {
     };
   }, []);
 
-  return { categories, loading, error };
+  return { categories, loading, error, setCategories };
 }
