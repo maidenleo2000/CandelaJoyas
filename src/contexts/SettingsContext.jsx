@@ -41,8 +41,8 @@ export default function SettingsProvider({ children }) {
     pageHeaderSubtitleColor: '#ffffff',
     // About Section
     showAbout: true,
-    aboutTitle: 'Sobre Genoveva',
-    aboutText: 'Genoveva InduStore nace con la misión de ofrecer moda inclusiva y real para todas las mujeres. Nuestro compromiso es la calidad y el diseño pensado para vos.',
+    aboutTitle: 'Sobre Candela Joyas',
+    aboutText: 'En Candela Joyas creemos que cada joya puede contar una historia y acompañarte en momentos especiales. Seleccionamos piezas que combinan elegancia, calidad y estilo, para que encuentres ese detalle que refleje tu personalidad y te haga brillar en cada momento.',
     showContactForm: true,
     catalogTitle: 'Catálogo',
     // Video Slider Settings
