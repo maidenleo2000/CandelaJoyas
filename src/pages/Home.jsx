@@ -246,37 +246,41 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="filter-group">
-              <div className="select-wrapper">
-                <select 
-                  value={selectedColor} 
-                  onChange={(e) => setSelectedColor(e.target.value)}
-                  className="sort-select"
-                >
-                  <option value="All">Todos los Colores</option>
-                  {availableColors.filter(c => c !== 'All').map(color => (
-                    <option key={color} value={color}>{color}</option>
-                  ))}
-                </select>
-                <ChevronDown size={16} className="select-arrow" />
+            {settings.showColorFilter && (
+              <div className="filter-group">
+                <div className="select-wrapper">
+                  <select
+                    value={selectedColor}
+                    onChange={(e) => setSelectedColor(e.target.value)}
+                    className="sort-select"
+                  >
+                    <option value="All">Todos los Colores</option>
+                    {availableColors.filter(c => c !== 'All').map(color => (
+                      <option key={color} value={color}>{color}</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="select-arrow" />
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="filter-group">
-              <div className="select-wrapper">
-                <select 
-                  value={selectedSize} 
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                  className="sort-select"
-                >
-                  <option value="All">Todos los Talles</option>
-                  {availableSizes.filter(s => s !== 'All').map(size => (
-                    <option key={size} value={size}>{size}</option>
-                  ))}
-                </select>
-                <ChevronDown size={16} className="select-arrow" />
+            {settings.showSizeFilter && (
+              <div className="filter-group">
+                <div className="select-wrapper">
+                  <select
+                    value={selectedSize}
+                    onChange={(e) => setSelectedSize(e.target.value)}
+                    className="sort-select"
+                  >
+                    <option value="All">Todos los Talles</option>
+                    {availableSizes.filter(s => s !== 'All').map(size => (
+                      <option key={size} value={size}>{size}</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="select-arrow" />
+                </div>
               </div>
-            </div>
+            )}
 
 
             <div className="filter-group offers-switch">

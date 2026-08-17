@@ -76,6 +76,9 @@ export default function SettingsProvider({ children }) {
     correoDefaultHeightCm: 20,
     enableStockManagement: false,
     lowStockThreshold: 5,
+    // Home Filters Settings
+    showColorFilter: true,
+    showSizeFilter: true,
     // Maintenance Mode Settings
     maintenanceMode: false,
     maintenanceTitle: 'Sitio en Mantenimiento',

@@ -163,6 +163,8 @@ export default function AdminDashboard() {
     marqueeTextColor: '#ffffff',
     marqueeFontSize: '0.85',
     marqueeHeight: '36',
+    showColorFilter: true,
+    showSizeFilter: true,
     maintenanceMode: false,
     maintenanceTitle: 'Sitio en Mantenimiento',
     maintenanceMessage: '',
@@ -2051,13 +2053,44 @@ export default function AdminDashboard() {
                   
                   <div className="form-group checkbox-group">
                     <label className="checkbox-label">
-                      <input 
+                      <input
                         type="checkbox"
-                        name="showBackToTop" 
-                        checked={siteSettings.showBackToTop} 
-                        onChange={(e) => setSiteSettings(prev => ({ ...prev, showBackToTop: e.target.checked }))} 
+                        name="showBackToTop"
+                        checked={siteSettings.showBackToTop}
+                        onChange={(e) => setSiteSettings(prev => ({ ...prev, showBackToTop: e.target.checked }))}
                       />
                       Mostrar botón "Volver arriba"
+                    </label>
+                  </div>
+                </div>
+
+                <div className="settings-section">
+                  <h3><Filter size={18} /> Filtros de Inicio</h3>
+                  <p className="text-muted" style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                    Elegí qué filtros de productos se muestran en la página de inicio.
+                  </p>
+
+                  <div className="form-group checkbox-group">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="showColorFilter"
+                        checked={siteSettings.showColorFilter !== false}
+                        onChange={handleSettingsChange}
+                      />
+                      Mostrar filtro de Colores
+                    </label>
+                  </div>
+
+                  <div className="form-group checkbox-group">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="showSizeFilter"
+                        checked={siteSettings.showSizeFilter !== false}
+                        onChange={handleSettingsChange}
+                      />
+                      Mostrar filtro de Talles
                     </label>
                   </div>
                 </div>
