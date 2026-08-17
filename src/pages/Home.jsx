@@ -283,28 +283,30 @@ export default function Home() {
             )}
 
 
-            <div className="filter-group offers-switch">
-              <span className="switch-label">Solo Ofertas</span>
-              <label className="switch">
-                <input 
-                  type="checkbox" 
-                  checked={showOnlyOffers}
-                  onChange={(e) => setShowOnlyOffers(e.target.checked)}
-                />
-                <span className="slider"></span>
-              </label>
-            </div>
+            <div className="filters-toggles">
+              <div className="filter-group offers-switch">
+                <span className="switch-label">Solo Ofertas</span>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={showOnlyOffers}
+                    onChange={(e) => setShowOnlyOffers(e.target.checked)}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
 
-            <div className="filter-group view-toggle-switch">
-              <span className="switch-label">Vista Cuadrícula</span>
-              <label className="switch">
-                <input 
-                  type="checkbox" 
-                  checked={isGridView}
-                  onChange={(e) => setIsGridView(e.target.checked)}
-                />
-                <span className="slider"></span>
-              </label>
+              <div className="filter-group view-toggle-switch">
+                <span className="switch-label">Vista Cuadrícula</span>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={isGridView}
+                    onChange={(e) => setIsGridView(e.target.checked)}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
