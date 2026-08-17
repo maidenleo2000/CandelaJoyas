@@ -1,5 +1,4 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 
 // Cargamos variables de entorno manualmente desde .env
@@ -12,27 +11,16 @@ envFile.split('\n').forEach(line => {
     }
 });
 
-const firebaseConfig = {
-  apiKey: env.VITE_FIREBASE_API_KEY,
-  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: env.VITE_FIREBASE_APP_ID,
-};
+const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY);
 
 async function generate() {
   console.log('--- Iniciando Generación de Sitemap ---');
   try {
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    console.log('Conectando con Firestore...');
-    const productsCol = collection(db, 'products');
-    const snapshot = await getDocs(productsCol);
-    const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    console.log('Conectando con Supabase...');
+    const { data: products, error } = await supabase.from('products').select('id, category');
+    if (error) throw error;
 
-    const baseUrl = 'https://genovevaindu.com.ar';
+    const baseUrl = 'https://candelajoyas.com.ar';
     const categories = [...new Set(products.map(p => p.category))];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

@@ -1,246 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://genovevaindu.com.ar/</loc>
+    <loc>https://candelajoyas.com.ar/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
-    <loc>https://genovevaindu.com.ar/?category=CAMISAS</loc>
+    <loc>https://candelajoyas.com.ar/?category=Aros</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://genovevaindu.com.ar/?category=SWEATERS</loc>
+    <loc>https://candelajoyas.com.ar/?category=Pulseras</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://genovevaindu.com.ar/?category=BUZOS</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/?category=PANTALON</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/?category=REMERAS</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/?category=CAMPERAS</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/?category=TAPADOS</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/?category=CARDIGAN</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/?category=BODYS</loc>
+    <loc>https://candelajoyas.com.ar/?category=Anillos</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://genovevaindu.com.ar/product/4tB56n1Fe7hB6QOCBdsM</loc>
-    <lastmod>2026-06-05</lastmod>
+    <loc>https://candelajoyas.com.ar/product/d2cff05e-6457-4311-bff3-00f14077fc26</loc>
+    <lastmod>2026-08-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://genovevaindu.com.ar/product/74VO2SJ7kHI2KO5iccY8</loc>
-    <lastmod>2026-06-05</lastmod>
+    <loc>https://candelajoyas.com.ar/product/977cb230-2d3c-424c-9561-3ec4fa3a688d</loc>
+    <lastmod>2026-08-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://genovevaindu.com.ar/product/8NYYbCneZS6lkMOW7gkb</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/92ZUnoBC9EjbeZLIIVot</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/A1iwzqfJoDbiLHb7MLEg</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/ATMmJWYRNshYIBTvKw0w</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/BJUzjK25MYknj0wNP7ID</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/BjjqH3a0wNxOyvIoghMQ</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/DmXCgGEyP4TcvkbhPCiV</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/EUJgIOQOvq5ItMuj4Cce</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/EdzTAlp7QlHFKE4MFs17</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/ExKCisYhALM7YljAydl6</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/GkVfTyZIjINKtV05kICj</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/HYLEWPnY4l10J4zJcah4</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/IErdKTiw20oPNgsM5x6x</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/Je3fhh5G06wlpWgsYGnA</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/NHLv8qCFri5i8zhrj40Z</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/OBOTDfNTKbfh6RACzacX</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/VGqm9sIza17gowGlao5i</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/W62mJNqknnwSJlkW7YBG</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/eyUmQf38NEP14EP6BS72</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/fqPfmEB1oiYyvFDt4u1W</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/h33xPIzqScW1Kv0hEpnS</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/l7WtGOBepOSge9oTRA4R</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/oUYs6yGvcDTHXTekrXkm</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/qkm0njPjgOBZYykuCRsc</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/sfgHQEHKAf5dq6I8gNSu</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/toOFwCloEF6MUfefObzp</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/uv1Pr7iRFPX2Nbm7tPSz</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/wMI06fbXRJjUoNCctEq3</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/waCiX6tTpDJ5ric2E0ps</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://genovevaindu.com.ar/product/zb7xKTfYyZgkgLtIf1hJ</loc>
-    <lastmod>2026-06-05</lastmod>
+    <loc>https://candelajoyas.com.ar/product/0ea54376-b919-421a-81a5-a8fb164377c0</loc>
+    <lastmod>2026-08-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
