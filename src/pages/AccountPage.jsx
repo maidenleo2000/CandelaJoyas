@@ -103,6 +103,13 @@ export default function AccountPage() {
   const [captchaToken, setCaptchaToken] = useState('');
   const [captchaResetKey, setCaptchaResetKey] = useState(0);
 
+  // Un solo widget de Turnstile a la vez (login/register/forgot son excluyentes).
+  // Al cambiar de modo el token del modo anterior ya no sirve.
+  useEffect(() => {
+    setCaptchaToken('');
+    setCaptchaResetKey(k => k + 1);
+  }, [mode]);
+
   useEffect(() => {
     document.title = 'Mi Cuenta';
   }, []);
@@ -152,13 +159,19 @@ export default function AccountPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (turnstileSiteKey && !captchaToken) {
+      toast.error('Completá la verificación anti-bots antes de continuar.');
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await login(email, password);
+      await login(email, password, captchaToken);
       toast.success('Sesión iniciada correctamente');
     } catch (error) {
       console.error(error);
       toast.error('Error al iniciar sesión. Revisá tus credenciales.');
+      setCaptchaToken('');
+      setCaptchaResetKey(k => k + 1);
     } finally {
       setIsSubmitting(false);
     }
@@ -207,9 +220,13 @@ export default function AccountPage() {
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
+    if (turnstileSiteKey && !captchaToken) {
+      toast.error('Completá la verificación anti-bots antes de continuar.');
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await resetPassword(email);
+      await resetPassword(email, captchaToken);
       toast.success('Te enviamos un email con un link para restablecer tu contraseña.');
       setMode('login');
     } catch (error) {
@@ -219,6 +236,8 @@ export default function AccountPage() {
       } else {
         toast.error(error.message || 'Error al enviar el email de recuperación.');
       }
+      setCaptchaToken('');
+      setCaptchaResetKey(k => k + 1);
     } finally {
       setIsSubmitting(false);
     }
@@ -265,7 +284,15 @@ export default function AccountPage() {
               <form onSubmit={handleLogin} className="login-form">
                 <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
                 <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required />
-                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                {turnstileSiteKey && (
+                  <Turnstile
+                    siteKey={turnstileSiteKey}
+                    resetKey={captchaResetKey}
+                    onVerify={setCaptchaToken}
+                    onExpire={() => setCaptchaToken('')}
+                  />
+                )}
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting || (!!turnstileSiteKey && !captchaToken)}>
                   {isSubmitting ? 'Ingresando...' : 'Iniciar Sesión'}
                 </button>
               </form>
@@ -308,7 +335,15 @@ export default function AccountPage() {
               <p>Ingresá tu email y te enviamos un link para restablecerla.</p>
               <form onSubmit={handleForgotPassword} className="login-form">
                 <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                {turnstileSiteKey && (
+                  <Turnstile
+                    siteKey={turnstileSiteKey}
+                    resetKey={captchaResetKey}
+                    onVerify={setCaptchaToken}
+                    onExpire={() => setCaptchaToken('')}
+                  />
+                )}
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting || (!!turnstileSiteKey && !captchaToken)}>
                   {isSubmitting ? 'Enviando...' : 'Enviar Link'}
                 </button>
               </form>

@@ -42,8 +42,12 @@ export default function AuthProvider({ children }) {
   };
 
   // Sign In function for Admin
-  const login = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const login = async (email, password, captchaToken) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: { captchaToken }
+    });
     if (error) throw error;
     return data;
   };
@@ -71,9 +75,10 @@ export default function AuthProvider({ children }) {
 
   // Envía el email de recuperación de contraseña con un link que redirige
   // a /restablecer-contrasena, donde Supabase deja una sesión temporal.
-  const resetPassword = async (email) => {
+  const resetPassword = async (email, captchaToken) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/restablecer-contrasena`
+      redirectTo: `${window.location.origin}/restablecer-contrasena`,
+      captchaToken
     });
     if (error) throw error;
   };
