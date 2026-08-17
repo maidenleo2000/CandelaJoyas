@@ -104,9 +104,9 @@ export default function Home() {
   useEffect(() => {
     const baseTitle = settings.siteTitle || 'Candela Joyas';
     if (selectedCategory === 'All') {
-      document.title = `${baseTitle} | Moda Inclusiva en Talles Reales`;
+      document.title = `${baseTitle} | Brillá en cada momento.`;
     } else {
-      document.title = `${selectedCategory} en Talles Reales | ${baseTitle}`;
+      document.title = `${selectedCategory} Brilla siempre | ${baseTitle}`;
     }
   }, [selectedCategory, settings.siteTitle]);
   
