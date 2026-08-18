@@ -99,6 +99,7 @@ export default function AdminDashboard() {
     name: '',
     price: '',
     category: '',
+    subcategory: '',
     imageUrl: '', // Keep for compatibility with existing products
     images: [], // Array of {url: string, isMain: boolean}
     description: '',
@@ -115,6 +116,8 @@ export default function AdminDashboard() {
   });
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [showNewSubcategoryInput, setShowNewSubcategoryInput] = useState(false);
+  const [newSubcategoryName, setNewSubcategoryName] = useState('');
 
   const [imageFiles, setImageFiles] = useState([]); // Array of File objects
   const [deletedImages, setDeletedImages] = useState([]); // Array of URLs to delete from Storage on save
@@ -500,11 +503,12 @@ export default function AdminDashboard() {
   const allExistingCategories = categories.map(cat => cat.name).sort();
 
   const resetForm = () => {
-    setFormData({ 
-      name: '', 
-      price: '', 
-      category: '', 
-      imageUrl: '', 
+    setFormData({
+      name: '',
+      price: '',
+      category: '',
+      subcategory: '',
+      imageUrl: '',
       images: [],
       description: '', 
       colors: '', 
@@ -522,6 +526,8 @@ export default function AdminDashboard() {
     setDeletedImages([]);
     setShowNewCategoryInput(false);
     setNewCategoryName('');
+    setShowNewSubcategoryInput(false);
+    setNewSubcategoryName('');
     setIsEditing(false);
     setCurrentId(null);
     setProductView('list');
@@ -534,6 +540,7 @@ export default function AdminDashboard() {
       name: product.name,
       price: product.price,
       category: product.category || '',
+      subcategory: product.subcategory || '',
       imageUrl: product.imageUrl || '',
       images: product.images || (product.imageUrl ? [{ url: product.imageUrl, isMain: true }] : []),
       description: product.description || '',
@@ -554,6 +561,15 @@ export default function AdminDashboard() {
       setNewCategoryName(product.category);
     } else {
       setShowNewCategoryInput(false);
+    }
+    // Check if subcategory exists within its category or needs new input
+    const productCategory = categories.find(cat => cat.name === product.category);
+    const existingSubcategories = productCategory?.subcategories.map(sub => sub.name) || [];
+    if (product.subcategory && !existingSubcategories.includes(product.subcategory)) {
+      setShowNewSubcategoryInput(true);
+      setNewSubcategoryName(product.subcategory);
+    } else {
+      setShowNewSubcategoryInput(false);
     }
     setProductView('edit');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -643,6 +659,7 @@ export default function AdminDashboard() {
       const finalImageUrl = mainImage ? mainImage.url : '';
 
       let finalCategory = showNewCategoryInput ? newCategoryName.trim() : formData.category;
+      let finalSubcategory = showNewSubcategoryInput ? newSubcategoryName.trim() : formData.subcategory;
 
       // Si es una categoría nueva, agregarla a la colección de categorías también (en settings)
       if (showNewCategoryInput && finalCategory) {
@@ -650,7 +667,8 @@ export default function AdminDashboard() {
         if (!categoryExists) {
           const newCategory = {
             id: Math.random().toString(36).substr(2, 9),
-            name: finalCategory
+            name: finalCategory,
+            subcategories: []
           };
           const { data: row, error: readError } = await supabase.from('site_settings').select('data').eq('id', 1).single();
           if (readError) {
@@ -666,6 +684,39 @@ export default function AdminDashboard() {
               toast.error(`No se pudo crear la categoría "${finalCategory}" en el listado global. El producto se guardará con esa categoría de todos modos.`);
             } else {
               setCategories(prev => [...prev, newCategory]);
+            }
+          }
+        }
+      }
+
+      // Si es una subcategoría nueva, agregarla dentro de su categoría (en settings)
+      if (finalSubcategory && finalCategory) {
+        const categoryForSub = categories.find(cat => cat.name.toLowerCase() === finalCategory.toLowerCase());
+        const subcategoryExists = categoryForSub?.subcategories.some(sub => sub.name.toLowerCase() === finalSubcategory.toLowerCase());
+        if (categoryForSub && !subcategoryExists) {
+          const newSubcategory = {
+            id: Math.random().toString(36).substr(2, 9),
+            name: finalSubcategory
+          };
+          const { data: row, error: readError } = await supabase.from('site_settings').select('data').eq('id', 1).single();
+          if (readError) {
+            console.error("Error leyendo site_settings para agregar subcategoría:", readError);
+            toast.error(`No se pudo crear la subcategoría "${finalSubcategory}" (error al leer configuración). El producto se guardará con esa subcategoría de todos modos.`);
+          } else {
+            const updatedCategories = (row.data?.categories || []).map(cat =>
+              cat.id === categoryForSub.id ? { ...cat, subcategories: [...(cat.subcategories || []), newSubcategory] } : cat
+            );
+            const { error: updateError } = await supabase.from('site_settings').update({
+              data: { ...row.data, categories: updatedCategories },
+              updated_at: new Date().toISOString(),
+            }).eq('id', 1);
+            if (updateError) {
+              console.error("Error guardando nueva subcategoría en settings:", updateError);
+              toast.error(`No se pudo crear la subcategoría "${finalSubcategory}" en el listado global. El producto se guardará con esa subcategoría de todos modos.`);
+            } else {
+              setCategories(prev => prev.map(cat =>
+                cat.id === categoryForSub.id ? { ...cat, subcategories: [...cat.subcategories, newSubcategory] } : cat
+              ));
             }
           }
         }
@@ -699,6 +750,7 @@ export default function AdminDashboard() {
       const formattedData = {
         name: formData.name,
         category: finalCategory,
+        subcategory: finalSubcategory,
         image_url: finalImageUrl,
         images: allImages,
         description: formData.description,
@@ -1219,6 +1271,9 @@ export default function AdminDashboard() {
                           className="admin-form-select"
                           value={showNewCategoryInput ? "NEW" : formData.category}
                           onChange={(e) => {
+                            setFormData(prev => ({ ...prev, subcategory: '' }));
+                            setShowNewSubcategoryInput(false);
+                            setNewSubcategoryName('');
                             if (e.target.value === "NEW") {
                               setShowNewCategoryInput(true);
                             } else {
@@ -1238,16 +1293,58 @@ export default function AdminDashboard() {
                           <ChevronDown size={18} />
                         </div>
                       </div>
-                      
+
                       {showNewCategoryInput && (
-                        <input 
-                          name="category" 
-                          value={newCategoryName} 
-                          onChange={(e) => setNewCategoryName(e.target.value)} 
-                          placeholder="Nombre de la nueva categoría" 
+                        <input
+                          name="category"
+                          value={newCategoryName}
+                          onChange={(e) => setNewCategoryName(e.target.value)}
+                          placeholder="Nombre de la nueva categoría"
                           className="animate-fade-in"
                           style={{ marginTop: '0.5rem' }}
-                          required 
+                          required
+                        />
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label>Subcategoría</label>
+                      <div className="admin-select-wrapper">
+                        <select
+                          className="admin-form-select"
+                          value={showNewSubcategoryInput ? "NEW" : formData.subcategory}
+                          onChange={(e) => {
+                            if (e.target.value === "NEW") {
+                              setShowNewSubcategoryInput(true);
+                            } else {
+                              setShowNewSubcategoryInput(false);
+                              setFormData(prev => ({ ...prev, subcategory: e.target.value }));
+                            }
+                          }}
+                          disabled={showNewCategoryInput || !formData.category}
+                        >
+                          <option value="">Sin subcategoría</option>
+                          {(categories.find(cat => cat.name === formData.category)?.subcategories || []).map(sub => (
+                            <option key={sub.id} value={sub.name}>{sub.name}</option>
+                          ))}
+                          {!showNewCategoryInput && formData.category && (
+                            <option value="NEW">+ Agregar nueva subcategoría...</option>
+                          )}
+                        </select>
+                        <div className="admin-select-icon">
+                          <ChevronDown size={18} />
+                        </div>
+                      </div>
+
+                      {showNewSubcategoryInput && (
+                        <input
+                          name="subcategory"
+                          value={newSubcategoryName}
+                          onChange={(e) => setNewSubcategoryName(e.target.value)}
+                          placeholder="Nombre de la nueva subcategoría"
+                          className="animate-fade-in"
+                          style={{ marginTop: '0.5rem' }}
+                          required
                         />
                       )}
                     </div>
@@ -1570,7 +1667,7 @@ export default function AdminDashboard() {
                               <span style={{ fontSize: '0.65rem', background: '#f3f4f6', color: '#4b5563', padding: '1px 6px', borderRadius: '10px', fontWeight: 'bold' }}>OCULTO</span>
                             )}
                           </div>
-                          <span>{product.category} - {product.isOnSale ? (
+                          <span>{product.category}{product.subcategory ? ` / ${product.subcategory}` : ''} - {product.isOnSale ? (
                             <span style={{ color: '#dc2626', fontWeight: 'bold' }}>
                               ${product.newPrice} <small style={{ textDecoration: 'line-through', color: '#9ca3af', fontWeight: 'normal' }}>${product.oldPrice}</small>
                             </span>
@@ -1629,8 +1726,8 @@ export default function AdminDashboard() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <strong>{product.name}</strong>
                           </div>
-                          <span>{product.category}</span>
-                          
+                          <span>{product.category}{product.subcategory ? ` / ${product.subcategory}` : ''}</span>
+
                           <div className="stock-alerts-list" style={{ marginTop: '10px' }}>
                             {Object.entries(product.stock)
                               .filter(([_, qty]) => qty <= (settings.lowStockThreshold || 5))

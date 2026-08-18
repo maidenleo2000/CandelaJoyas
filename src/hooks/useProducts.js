@@ -7,6 +7,7 @@ export function fromRow(row) {
     name: row.name,
     price: row.price,
     category: row.category,
+    subcategory: row.subcategory,
     imageUrl: row.image_url,
     images: row.images,
     description: row.description,

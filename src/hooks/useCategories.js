@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 
+function normalizeSubcategories(subs) {
+  return (subs || []).map((s, index) =>
+    typeof s === 'string' ? { id: `sub-${index}`, name: s } : s
+  );
+}
+
 function normalize(data) {
   const cats = data?.categories || [];
-  return cats.map((c, index) =>
-    typeof c === 'string' ? { id: `cat-${index}`, name: c } : c
-  );
+  return cats.map((c, index) => {
+    const category = typeof c === 'string' ? { id: `cat-${index}`, name: c } : c;
+    return { ...category, subcategories: normalizeSubcategories(category.subcategories) };
+  });
 }
 
 export function useCategories() {
