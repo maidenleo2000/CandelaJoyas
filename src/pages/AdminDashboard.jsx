@@ -84,6 +84,12 @@ export default function AdminDashboard() {
   }, [location]);
 
   const [adminCategoryFilter, setAdminCategoryFilter] = useState('All');
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false);
+
+  // Quick Stock Adjustment State (agregar stock desde la tarjeta del producto)
+  const [stockAdjustProduct, setStockAdjustProduct] = useState(null);
+  const [stockAdjustDeltas, setStockAdjustDeltas] = useState({});
+  const [isAdjustingStock, setIsAdjustingStock] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -105,6 +111,7 @@ export default function AdminDashboard() {
     description: '',
     colors: '',
     sizes: '',
+    stockMode: 'talle', // 'talle' o 'color': en base a qué atributo se controla el stock
     isOnSale: false,
     isPaused: false,
     isHidden: false,
@@ -510,9 +517,10 @@ export default function AdminDashboard() {
       subcategory: '',
       imageUrl: '',
       images: [],
-      description: '', 
-      colors: '', 
+      description: '',
+      colors: '',
       sizes: '',
+      stockMode: 'talle',
       isOnSale: false,
       isPaused: false,
       isHidden: false,
@@ -546,6 +554,7 @@ export default function AdminDashboard() {
       description: product.description || '',
       colors: product.colors?.join(', ') || '',
       sizes: product.sizes?.join(', ') || '',
+      stockMode: product.stockMode || 'talle',
       isOnSale: product.isOnSale || false,
       isPaused: product.isPaused || false,
       isHidden: product.isHidden || false,
@@ -723,27 +732,38 @@ export default function AdminDashboard() {
       }
 
       // Limpiar stock obsoleto (ej: si cambió de talle único a talles específicos o agregó colores)
-      const currentSizes = formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const currentSizes = formData.stockMode === 'color'
+        ? []
+        : (formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : []);
       const currentColors = formData.colors ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : [];
       const cleanedStock = {};
-      
+
       if (formData.stock) {
-        currentSizes.forEach(size => {
-          if (currentColors.length === 0) {
-            // Solo talle
-            if (formData.stock[size] !== undefined) {
-              cleanedStock[size] = formData.stock[size];
+        if (formData.stockMode === 'color') {
+          // Solo color
+          currentColors.forEach(color => {
+            if (formData.stock[color] !== undefined) {
+              cleanedStock[color] = formData.stock[color];
             }
-          } else {
-            // Talle + Color
-            currentColors.forEach(color => {
-              const key = `${size}_${color}`;
-              if (formData.stock[key] !== undefined) {
-                cleanedStock[key] = formData.stock[key];
+          });
+        } else {
+          currentSizes.forEach(size => {
+            if (currentColors.length === 0) {
+              // Solo talle
+              if (formData.stock[size] !== undefined) {
+                cleanedStock[size] = formData.stock[size];
               }
-            });
-          }
-        });
+            } else {
+              // Talle + Color
+              currentColors.forEach(color => {
+                const key = `${size}_${color}`;
+                if (formData.stock[key] !== undefined) {
+                  cleanedStock[key] = formData.stock[key];
+                }
+              });
+            }
+          });
+        }
       }
 
       // Preparar y normalizar los datos (mapeados a las columnas de la tabla products)
@@ -765,6 +785,7 @@ export default function AdminDashboard() {
         colors: currentColors,
         sizes: currentSizes,
         stock: cleanedStock,
+        stock_mode: formData.stockMode,
         updated_at: new Date().toISOString(),
       };
       if (isEditing) {
@@ -823,6 +844,59 @@ export default function AdminDashboard() {
       console.error(error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const openStockAdjust = (product) => {
+    setStockAdjustProduct(product);
+    setStockAdjustDeltas({});
+  };
+
+  const closeStockAdjust = () => {
+    setStockAdjustProduct(null);
+    setStockAdjustDeltas({});
+  };
+
+  const handleStockDeltaChange = (key, value) => {
+    setStockAdjustDeltas(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleStockAdjustSubmit = async (e) => {
+    e.preventDefault();
+    if (!stockAdjustProduct) return;
+
+    const hasChanges = Object.values(stockAdjustDeltas).some(v => Number(v) !== 0 && v !== '');
+    if (!hasChanges) {
+      toast.error('Ingresa alguna cantidad a agregar');
+      return;
+    }
+
+    setIsAdjustingStock(true);
+    try {
+      const newStock = { ...(stockAdjustProduct.stock || {}) };
+      Object.entries(stockAdjustDeltas).forEach(([key, delta]) => {
+        const numDelta = Number(delta) || 0;
+        if (numDelta !== 0) {
+          newStock[key] = Math.max(0, (Number(newStock[key]) || 0) + numDelta);
+        }
+      });
+
+      const { data: updatedRow, error } = await supabase
+        .from('products')
+        .update({ stock: newStock, updated_at: new Date().toISOString() })
+        .eq('id', stockAdjustProduct.id)
+        .select()
+        .single();
+      if (error) throw error;
+
+      setProducts(prev => prev.map(p => p.id === stockAdjustProduct.id ? productFromRow(updatedRow) : p));
+      toast.success('Stock actualizado correctamente');
+      closeStockAdjust();
+    } catch (error) {
+      console.error('Error al agregar stock:', error);
+      toast.error('Hubo un error al actualizar el stock');
+    } finally {
+      setIsAdjustingStock(false);
     }
   };
 
@@ -1350,75 +1424,6 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  {settings.enableStockManagement && (
-                    <div className="form-group animate-fade-in" style={{ padding: '1.5rem', border: '1px solid var(--color-primary)', borderRadius: '12px', background: 'rgba(212, 163, 115, 0.05)', marginBottom: '1.5rem' }}>
-                      <label style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Package size={18} /> Gestión de Stock por Talle y Color
-                      </label>
-                      <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '1.5rem' }}>
-                        Define cuántas unidades hay de cada combinación. Si no usas colores, solo completa el talle.
-                      </p>
-                      
-                      {!formData.sizes ? (
-                        <p style={{ fontSize: '0.85rem', color: '#dc2626' }}>Primero debes ingresar los talles arriba (ej: S, M, L).</p>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                          {formData.sizes.split(',').map(s => s.trim()).filter(Boolean).map(size => (
-                            <div key={size} style={{ background: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-                              <h4 style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: 'var(--color-primary)', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
-                                Talle: {size}
-                              </h4>
-                              
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem' }}>
-                                {(!formData.colors || formData.colors.trim() === '') ? (
-                                  <div className="stock-input-group">
-                                    <label style={{ fontSize: '0.7rem', color: '#666' }}>Stock General</label>
-                                    <input 
-                                      type="number" 
-                                      min="0" 
-                                      value={formData.stock?.[size] || 0} 
-                                      onChange={(e) => {
-                                        const val = parseInt(e.target.value) || 0;
-                                        setFormData(prev => ({
-                                          ...prev,
-                                          stock: {
-                                            ...(prev.stock || {}),
-                                            [size]: val
-                                          }
-                                        }));
-                                      }}
-                                    />
-                                  </div>
-                                ) : (
-                                  formData.colors.split(',').map(c => c.trim()).filter(Boolean).map(color => (
-                                    <div key={`${size}_${color}`} className="stock-input-group">
-                                      <label style={{ fontSize: '0.7rem', color: '#666' }}>Color: {color}</label>
-                                      <input 
-                                        type="number" 
-                                        min="0" 
-                                        value={formData.stock?.[`${size}_${color}`] || 0} 
-                                        onChange={(e) => {
-                                          const val = parseInt(e.target.value) || 0;
-                                          setFormData(prev => ({
-                                            ...prev,
-                                            stock: {
-                                              ...(prev.stock || {}),
-                                              [`${size}_${color}`]: val
-                                            }
-                                          }));
-                                        }}
-                                      />
-                                    </div>
-                                  ))
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
                   <div className="form-group" style={{ padding: '1.5rem', border: '1px solid #E5E7EB', borderRadius: '12px', background: '#f9fafb' }}>
                     <label style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '1rem' }}>Imagen del Producto *</label>
                     
@@ -1584,11 +1589,132 @@ export default function AdminDashboard() {
                       <label>Colores (separados por coma)</label>
                       <input name="colors" value={formData.colors} onChange={handleInputChange} placeholder="Rojo, Azul, Beig" />
                     </div>
-                    <div className="form-group">
-                      <label>Talles (separados por coma)</label>
-                      <input name="sizes" value={formData.sizes} onChange={handleInputChange} placeholder="S, M, L, XL" />
-                    </div>
+                    {formData.stockMode !== 'color' && (
+                      <div className="form-group">
+                        <label>Talles (separados por coma)</label>
+                        <input name="sizes" value={formData.sizes} onChange={handleInputChange} placeholder="S, M, L, XL" />
+                      </div>
+                    )}
                   </div>
+
+                  {settings.enableStockManagement && (
+                    <div className="form-group animate-fade-in" style={{ padding: '1.5rem', border: '1px solid var(--color-primary)', borderRadius: '12px', background: 'rgba(212, 163, 115, 0.05)', marginBottom: '1.5rem' }}>
+                      <label style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Package size={18} /> Gestión de Stock
+                      </label>
+                      <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '1rem' }}>
+                        Elegí en base a qué atributo se controla el stock de este producto.
+                      </p>
+
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, stockMode: 'talle' }))}
+                          className={`btn ${formData.stockMode !== 'color' ? 'btn-primary' : 'btn-outline'}`}
+                          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                        >
+                          Por Talle
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, stockMode: 'color' }))}
+                          className={`btn ${formData.stockMode === 'color' ? 'btn-primary' : 'btn-outline'}`}
+                          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                        >
+                          Por Color
+                        </button>
+                      </div>
+
+                      {formData.stockMode === 'color' ? (
+                        !formData.colors ? (
+                          <p style={{ fontSize: '0.85rem', color: '#dc2626' }}>Primero debes ingresar los colores arriba (ej: Dorado, Plateado).</p>
+                        ) : (
+                          <div style={{ background: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem' }}>
+                              {formData.colors.split(',').map(c => c.trim()).filter(Boolean).map(color => (
+                                <div key={color} className="stock-input-group">
+                                  <label style={{ fontSize: '0.7rem', color: '#666' }}>Color: {color}</label>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={formData.stock?.[color] || 0}
+                                    onChange={(e) => {
+                                      const val = parseInt(e.target.value) || 0;
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        stock: {
+                                          ...(prev.stock || {}),
+                                          [color]: val
+                                        }
+                                      }));
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        !formData.sizes ? (
+                          <p style={{ fontSize: '0.85rem', color: '#dc2626' }}>Primero debes ingresar los talles arriba (ej: S, M, L).</p>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            {formData.sizes.split(',').map(s => s.trim()).filter(Boolean).map(size => (
+                              <div key={size} style={{ background: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                                <h4 style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: 'var(--color-primary)', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
+                                  Talle: {size}
+                                </h4>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem' }}>
+                                  {(!formData.colors || formData.colors.trim() === '') ? (
+                                    <div className="stock-input-group">
+                                      <label style={{ fontSize: '0.7rem', color: '#666' }}>Stock General</label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        value={formData.stock?.[size] || 0}
+                                        onChange={(e) => {
+                                          const val = parseInt(e.target.value) || 0;
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            stock: {
+                                              ...(prev.stock || {}),
+                                              [size]: val
+                                            }
+                                          }));
+                                        }}
+                                      />
+                                    </div>
+                                  ) : (
+                                    formData.colors.split(',').map(c => c.trim()).filter(Boolean).map(color => (
+                                      <div key={`${size}_${color}`} className="stock-input-group">
+                                        <label style={{ fontSize: '0.7rem', color: '#666' }}>Color: {color}</label>
+                                        <input
+                                          type="number"
+                                          min="0"
+                                          value={formData.stock?.[`${size}_${color}`] || 0}
+                                          onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            setFormData(prev => ({
+                                              ...prev,
+                                              stock: {
+                                                ...(prev.stock || {}),
+                                                [`${size}_${color}`]: val
+                                              }
+                                            }));
+                                          }}
+                                        />
+                                      </div>
+                                    ))
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label>Descripción corta</label>
@@ -1610,14 +1736,14 @@ export default function AdminDashboard() {
               <div className="admin-list-panel full-width animate-fade-in">
                 <div className="admin-list-header">
                   <h3 className="admin-list-title">
-                    <Package size={22} color="var(--color-primary)" /> 
-                    Productos Actuales ({products.filter(p => adminCategoryFilter === 'All' || p.category === adminCategoryFilter).length})
+                    <Package size={22} color="var(--color-primary)" />
+                    Productos Actuales ({products.filter(p => (adminCategoryFilter === 'All' || p.category === adminCategoryFilter) && (!showLowStockOnly || (p.stock && Object.values(p.stock).some(qty => qty <= (settings.lowStockThreshold || 5))))).length})
                   </h3>
-                  
+
                   <div className="admin-filter-container">
                     <div className="admin-filter-group">
-                      <select 
-                        value={adminCategoryFilter} 
+                      <select
+                        value={adminCategoryFilter}
                         onChange={(e) => setAdminCategoryFilter(e.target.value)}
                         className="admin-category-select"
                       >
@@ -1630,6 +1756,17 @@ export default function AdminDashboard() {
                         <ChevronDown size={18} />
                       </div>
                     </div>
+                    {settings.enableStockManagement && (
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                        <input
+                          type="checkbox"
+                          checked={showLowStockOnly}
+                          onChange={(e) => setShowLowStockOnly(e.target.checked)}
+                          style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                        />
+                        Solo stock bajo
+                      </label>
+                    )}
                     <div style={{ display: 'flex', gap: '10px' }}>
                       <button 
                         className="btn btn-outline" 
@@ -1653,7 +1790,7 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="admin-products-list-grid">
                     {products
-                      .filter(p => adminCategoryFilter === 'All' || p.category === adminCategoryFilter)
+                      .filter(p => (adminCategoryFilter === 'All' || p.category === adminCategoryFilter) && (!showLowStockOnly || (p.stock && Object.values(p.stock).some(qty => qty <= (settings.lowStockThreshold || 5)))))
                       .map(product => (
                       <div key={product.id} className="admin-product-card glass">
                         <img src={product.imageUrl} alt={product.name} />
@@ -1689,6 +1826,11 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div className="admin-product-actions">
+                          {settings.enableStockManagement && product.stock && Object.keys(product.stock).length > 0 && (
+                            <button onClick={() => openStockAdjust(product)} className="icon-btn" aria-label="Agregar Stock" title="Agregar Stock">
+                              <Package size={16} />
+                            </button>
+                          )}
                           <button onClick={() => handleEdit(product)} className="icon-btn edit-btn" aria-label="Editar">
                             <Edit2 size={16} />
                           </button>
@@ -1744,7 +1886,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="admin-product-actions">
-                          <button onClick={() => handleEdit(product)} className="btn btn-primary" style={{ padding: '0.5rem', fontSize: '0.8rem' }}>
+                          <button onClick={() => openStockAdjust(product)} className="btn btn-primary" style={{ padding: '0.5rem', fontSize: '0.8rem' }}>
                             Reponer Stock
                           </button>
                         </div>
@@ -1760,6 +1902,48 @@ export default function AdminDashboard() {
               </div>
             )}
             
+            {/* Modal para Agregar Stock Rápido */}
+            {stockAdjustProduct && (
+              <div className="modal-overlay" onClick={closeStockAdjust}>
+                <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()}>
+                  <div className="modal-header">
+                    <h3>Agregar Stock: {stockAdjustProduct.name}</h3>
+                    <button className="close-btn" onClick={closeStockAdjust}><X size={24} /></button>
+                  </div>
+                  <form onSubmit={handleStockAdjustSubmit} className="modal-body">
+                    <p style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                      Ingresa la cantidad a sumar al stock actual de cada variante. Dejá en blanco las que no quieras modificar.
+                    </p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '300px', overflowY: 'auto' }}>
+                      {Object.entries(stockAdjustProduct.stock || {}).map(([key, qty]) => (
+                        <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                          <span style={{ fontSize: '0.9rem' }}>
+                            {key.replace('_', ' ')} <small style={{ color: 'var(--text-muted)' }}>(actual: {qty})</small>
+                          </span>
+                          <input
+                            type="number"
+                            step="1"
+                            placeholder="0"
+                            value={stockAdjustDeltas[key] ?? ''}
+                            onChange={(e) => handleStockDeltaChange(key, e.target.value)}
+                            style={{ width: '90px' }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="modal-footer" style={{ marginTop: '2rem' }}>
+                      <button type="button" className="btn btn-outline" onClick={closeStockAdjust}>Cancelar</button>
+                      <button type="submit" className="btn btn-primary" disabled={isAdjustingStock}>
+                        {isAdjustingStock ? 'Guardando...' : 'Agregar Stock'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
             {/* Modal para Actualización Masiva de Precios */}
             {showBulkPriceModal && (
               <div className="modal-overlay" onClick={() => setShowBulkPriceModal(false)}>

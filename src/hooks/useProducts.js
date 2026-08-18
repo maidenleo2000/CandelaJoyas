@@ -14,6 +14,7 @@ export function fromRow(row) {
     colors: row.colors,
     sizes: row.sizes,
     stock: row.stock,
+    stockMode: row.stock_mode || 'talle',
     isOnSale: row.is_on_sale,
     isPaused: row.is_paused,
     isHidden: row.is_hidden,

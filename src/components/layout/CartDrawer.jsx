@@ -5,6 +5,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { X, ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { supabase } from "../../services/supabase";
+import { getStockKey } from "../../utils/stock";
 import CheckoutModal from "./CheckoutModal";
 import "./CartDrawer.css";
 
@@ -41,18 +42,20 @@ export default function CartDrawer({ isOpen, onClose }) {
         for (const item of cart) {
           const { data: productData } = await supabase
             .from('products')
-            .select('colors, stock')
+            .select('colors, stock, stock_mode')
             .eq('id', item.id)
             .single();
 
           if (productData) {
-            // Determinamos la key de stock (Talle_Color o solo Talle)
-            const hasColors = productData.colors && productData.colors.length > 0;
-            const stockKey = (hasColors && item.selectedColor) ? `${item.selectedSize}_${item.selectedColor}` : item.selectedSize;
+            // Determinamos la key de stock según el modo del producto (talle, talle_color o color)
+            const stockKey = getStockKey(productData.stock_mode, productData.colors, { size: item.selectedSize, color: item.selectedColor });
             const currentStock = productData.stock?.[stockKey] || 0;
 
             if (currentStock < item.quantity) {
-              const variantLabel = hasColors ? `${item.selectedSize} - ${item.selectedColor}` : item.selectedSize;
+              const hasColors = productData.colors && productData.colors.length > 0;
+              const variantLabel = productData.stock_mode === 'color'
+                ? item.selectedColor
+                : (hasColors ? `${item.selectedSize} - ${item.selectedColor}` : item.selectedSize);
               toast.error(`Lo sentimos, solo quedan ${currentStock} unidades de "${item.name}" (Variante: ${variantLabel})`);
               setIsSubmitting(false);
               return;
@@ -285,8 +288,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                         <button
                           onClick={() => {
                             if (settings.enableStockManagement) {
-                              const hasColors = item.colors && item.colors.length > 0;
-                              const stockKey = (hasColors && item.selectedColor) ? `${item.selectedSize}_${item.selectedColor}` : item.selectedSize;
+                              const stockKey = getStockKey(item.stockMode, item.colors, { size: item.selectedSize, color: item.selectedColor });
                               const currentStock = item.stock?.[stockKey] || 0;
                               
                               if (item.quantity >= currentStock) {

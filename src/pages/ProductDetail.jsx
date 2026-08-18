@@ -6,6 +6,7 @@ import { useProducts } from '../hooks/useProducts';
 import { CartContext } from '../contexts/CartContext';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { toast } from 'react-hot-toast';
+import { getStockKey, hasVariantSelected } from '../utils/stock';
 import './ProductDetail.css';
 
 export default function ProductDetail() {
@@ -395,17 +396,16 @@ export default function ProductDetail() {
           <div className="purchase-actions">
             {/* Stock Calculation */}
             {(() => {
-              // Stock actual para el talle y color seleccionado
+              // Stock actual para la variante seleccionada (talle o color, según el modo del producto)
+              const isColorMode = product.stockMode === 'color';
+              const variantSelected = hasVariantSelected(product.stockMode, { size: selectedSize, color: selectedColor });
               let availableStock = 999;
-              if (settings.enableStockManagement && product.stock) {
-                if (selectedSize) {
-                  const hasColors = product.colors && product.colors.length > 0;
-                  const stockKey = (hasColors && selectedColor) ? `${selectedSize}_${selectedColor}` : selectedSize;
-                  availableStock = product.stock[stockKey] !== undefined ? product.stock[stockKey] : 0;
-                }
+              if (settings.enableStockManagement && product.stock && variantSelected) {
+                const stockKey = getStockKey(product.stockMode, product.colors, { size: selectedSize, color: selectedColor });
+                availableStock = product.stock[stockKey] !== undefined ? product.stock[stockKey] : 0;
               }
-              const isOutOfStock = settings.enableStockManagement && selectedSize && availableStock <= 0;
-              
+              const isOutOfStock = settings.enableStockManagement && variantSelected && availableStock <= 0;
+
               return (
                 <>
                   {!product.isPaused && (
@@ -430,15 +430,15 @@ export default function ProductDetail() {
                     </div>
                   )}
 
-                  {settings.enableStockManagement && selectedSize && (
+                  {settings.enableStockManagement && variantSelected && (
                     <div className="stock-info animate-fade-in" style={{ marginBottom: '1rem' }}>
                       {availableStock > 0 ? (
-                        <span className="stock-badge available" style={{ fontSize: '0.85rem', color: '#059669', fontWeight: '500' }}>
-                          ¡Stock disponible! ({availableStock} unidades {selectedColor ? `en color ${selectedColor}` : ''})
+                        <span className="stock-badge available" style={{ fontSize: '0.85rem', color: 'var(--color-dark)', fontWeight: '500', background: 'var(--color-secondary)', padding: '0.3rem 0.7rem', borderRadius: 'var(--radius-sm)', display: 'inline-block' }}>
+                          ¡Stock disponible! ({availableStock} unidades {(!isColorMode && selectedColor) ? `en color ${selectedColor}` : ''})
                         </span>
                       ) : (
                         <span className="stock-badge out-of-stock" style={{ fontSize: '0.85rem', color: '#dc2626', fontWeight: 'bold' }}>
-                          Agotado {selectedColor ? `en ${selectedColor}` : 'en este talle'}
+                          Agotado {isColorMode ? `en color ${selectedColor}` : (selectedColor ? `en ${selectedColor}` : 'en este talle')}
                         </span>
                       )}
                     </div>

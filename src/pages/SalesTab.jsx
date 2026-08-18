@@ -141,28 +141,30 @@ export default function SalesTab() {
 
   const updateSaleStatus = async (id, newStatus) => {
     try {
-      // Si la gestión de stock está activa y el nuevo estado es "Confirmada"
-      // debemos restar el stock de los productos
-      if (settings.enableStockManagement && newStatus === 'Confirmada') {
-        const currentSale = sales.find(s => s.id === id);
+      // El stock ya se descuenta automáticamente al crear el pedido (status "Pendiente")
+      // y se restaura automáticamente si se cancela (triggers en la base de datos, ver
+      // migración 0011_stock_deduct_on_pending.sql). Este fallback solo cubre pedidos
+      // que hayan quedado sin descontar (ej: creados antes de esa migración).
+      const currentSale = sales.find(s => s.id === id);
+      const deductingStatuses = ['Confirmada', 'Enviada', 'Completada'];
+      const needsFallbackDeduction = settings.enableStockManagement
+        && deductingStatuses.includes(newStatus)
+        && !currentSale?.stockDeducted;
 
-        // Solo descontar si el estado anterior NO era ya Confirmada, Enviada o Completada (para evitar descuentos dobles)
-        const alreadyDeducted = ['Confirmada', 'Enviada', 'Completada'].includes(currentSale?.status);
+      if (needsFallbackDeduction) {
+        const { error: rpcError } = await supabase.rpc('deduct_stock_for_sale', { sale_id: id });
+        if (rpcError) throw rpcError;
 
-        if (!alreadyDeducted) {
-          const { error: rpcError } = await supabase.rpc('deduct_stock_for_sale', { sale_id: id });
-          if (rpcError) throw rpcError;
+        const { error } = await supabase.from('sales').update({
+          status: newStatus,
+          stock_deducted: true,
+          updated_at: new Date().toISOString(),
+        }).eq('id', id);
+        if (error) throw error;
 
-          const { error } = await supabase.from('sales').update({
-            status: newStatus,
-            updated_at: new Date().toISOString(),
-          }).eq('id', id);
-          if (error) throw error;
-
-          setSales(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
-          toast.success("Estado actualizado y stock descontado");
-          return;
-        }
+        setSales(prev => prev.map(s => s.id === id ? { ...s, status: newStatus, stockDeducted: true } : s));
+        toast.success("Estado actualizado y stock descontado");
+        return;
       }
 
       const { error } = await supabase.from('sales').update({
@@ -170,7 +172,9 @@ export default function SalesTab() {
         updated_at: new Date().toISOString(),
       }).eq('id', id);
       if (error) throw error;
-      setSales(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
+      setSales(prev => prev.map(s => s.id === id
+        ? { ...s, status: newStatus, stockDeducted: newStatus === 'Cancelada' ? false : s.stockDeducted }
+        : s));
       toast.success("Estado actualizado");
     } catch (error) {
       console.error("Error updating sale status:", error);

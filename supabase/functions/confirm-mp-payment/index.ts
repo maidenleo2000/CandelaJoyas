@@ -54,15 +54,20 @@ Deno.serve(async (req) => {
       }).eq("id", orderId);
       if (updateError) throw updateError;
 
-      const { data: siteSettings } = await admin
-        .from("site_settings")
-        .select("data")
-        .eq("id", 1)
-        .single();
+      // El stock ya se descuenta automáticamente al crear el pedido (trigger en "sales",
+      // ver 0011_stock_deduct_on_pending.sql). Este fallback solo cubre pedidos que
+      // hayan quedado sin descontar (ej: creados antes de esa migración).
+      if (!order.stock_deducted) {
+        const { data: siteSettings } = await admin
+          .from("site_settings")
+          .select("data")
+          .eq("id", 1)
+          .single();
 
-      const alreadyDeducted = ["Confirmada", "Enviada", "Completada"].includes(order.status);
-      if (siteSettings?.data?.enableStockManagement && !alreadyDeducted) {
-        await admin.rpc("deduct_stock_for_sale", { sale_id: orderId });
+        if (siteSettings?.data?.enableStockManagement) {
+          await admin.rpc("deduct_stock_for_sale", { sale_id: orderId });
+          await admin.from("sales").update({ stock_deducted: true }).eq("id", orderId);
+        }
       }
     }
 
