@@ -1,4 +1,4 @@
-# Guía de Usuario - Panel de Administración Genoveva InduStore
+# Guía de Usuario - Panel de Administración Candela Joyas
 
 Bienvenido al manual de uso del Panel de Administración. Esta guía te explicará detalladamente cómo utilizar todas las herramientas disponibles para gestionar tu tienda online de manera eficiente.
 
@@ -78,7 +78,7 @@ Herramienta especial para facilitar tu trabajo en Instagram u otras redes.
 
 ## 6. Configuración del Sitio
 
-Personaliza la apariencia de Genoveva sin necesidad de un diseñador web.
+Personaliza la apariencia de Candela Joyas sin necesidad de un diseñador web.
 
 - **Logo e Identidad:** Sube tu logo principal y el Favicon (el ícono que aparece en la pestaña del navegador).
 - **Paleta de Colores:** Modifica el Color Primario (botones y detalles) y Secundario (fondos) de la tienda.

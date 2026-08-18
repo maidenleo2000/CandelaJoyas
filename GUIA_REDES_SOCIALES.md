@@ -14,7 +14,7 @@ Meta (dueña de Facebook e Instagram) exige que **cualquier** publicación autom
 
 1. Entrá a [developers.facebook.com](https://developers.facebook.com/) con tu usuario de Facebook.
 2. "Mis apps" → "Crear app" → elegí el tipo **"Negocio"**.
-3. Ponele un nombre (ej. "Genoveva InduStore - Publicador").
+3. Ponele un nombre (ej. "Candela Joyas - Publicador").
 4. Una vez creada, en el panel de la app agregá el producto **"Facebook Login"** y el producto **"Instagram Graph API"** (buscalos en "Agregar productos").
 
 ## Paso 2: Configurar Facebook Login

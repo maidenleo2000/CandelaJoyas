@@ -1,4 +1,4 @@
-package com.genovevatienda.app;
+package com.candelajoyas.app;
 
 import com.getcapacitor.BridgeActivity;
 

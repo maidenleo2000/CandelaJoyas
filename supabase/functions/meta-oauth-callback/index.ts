@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const { appId, appSecret } = await getMetaCredentials();
   const returnUrl = (url.searchParams.get("state") && decodeURIComponent(url.searchParams.get("state")!))
-    || "https://genovevaindu.com.ar/admin";
+    || "https://candelajoyas.com.ar/admin";
 
   const errorParam = url.searchParams.get("error");
   if (errorParam) {

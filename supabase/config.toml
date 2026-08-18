@@ -15,6 +15,9 @@ verify_jwt = false
 [functions.on-sale-created-notify]
 verify_jwt = false
 
+[functions.on-sale-created-email]
+verify_jwt = false
+
 [functions.on-sale-approved-notify]
 verify_jwt = false
 

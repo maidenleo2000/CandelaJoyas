@@ -1,4 +1,4 @@
-# Optimized robots.txt for Genoveva InduStore
+# Optimized robots.txt for Candela Joyas
 # Focused on inclusivity and efficiency
 
 User-agent: *
@@ -9,7 +9,7 @@ Disallow: /admin/
 Disallow: /admin/*
 
 # Sitemap location
-Sitemap: https://genovevaindu.com.ar/sitemap.xml
+Sitemap: https://candelajoyas.com.ar/sitemap.xml
 
 # Crawl-delay for some bots to preserve server resources
 User-agent: magpie-crawler

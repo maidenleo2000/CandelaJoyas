@@ -24,7 +24,8 @@ Deno.serve(async (req) => {
     }
 
     const mpId = record?.mercadopago_payment_id;
-    const displayOrderId = mpId ? mpId : orderId;
+    const saleNumber = record?.sale_number;
+    const reference = saleNumber ? `VTA-${String(saleNumber).padStart(6, "0")}` : orderId;
 
     const resp = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -33,20 +34,21 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
-        from: "Genoveva InduStore <pedidos@genovevaindu.com.ar>",
+        from: "Candela Joyas <pedidos@candelajoyas.com.ar>",
         to: [customerEmail],
-        subject: "¡Tu pago ha sido confirmado! 🛍️ - Genoveva InduStore",
+        subject: "¡Tu pago ha sido confirmado! 🛍️ - Candela Joyas",
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; padding: 20px;">
             <h2 style="color: #d4a373; text-align: center;">¡Gracias por tu compra, ${customerName}!</h2>
             <p style="font-size: 16px; color: #333;">Te confirmamos que hemos recibido tu pago correctamente por un total de <strong>$${Number(total).toLocaleString()}</strong>.</p>
             <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 0; color: #666;">${mpId ? "Referencia de Pago:" : "ID de Pedido:"} <strong>${displayOrderId}</strong></p>
+              <p style="margin: 0; color: #666;">Número de pedido: <strong>${reference}</strong></p>
+              ${mpId ? `<p style="margin: 5px 0 0 0; color: #666;">Referencia de pago: <strong>${mpId}</strong></p>` : ""}
               <p style="margin: 5px 0 0 0; color: #666;">Estado: <span style="color: #28a745; font-weight: bold;">Pago Aprobado</span></p>
             </div>
             <p style="font-size: 14px; color: #666;">Nos pondremos en contacto contigo a la brevedad para coordinar la entrega de tus productos.</p>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            <p style="font-size: 12px; color: #999; text-align: center;">Este es un mensaje automático de Genoveva InduStore. Por favor no respondas a este correo.</p>
+            <p style="font-size: 12px; color: #999; text-align: center;">Este es un mensaje automático de Candela Joyas. Por favor no respondas a este correo.</p>
           </div>
         `,
       }),

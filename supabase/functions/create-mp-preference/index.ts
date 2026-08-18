@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    const prodHost = Deno.env.get("STORE_ORIGIN") || customerData?.origin || "https://genovevaindu.com.ar";
+    const prodHost = Deno.env.get("STORE_ORIGIN") || customerData?.origin || "https://candelajoyas.com.ar";
 
     const preferenceBody = {
       items: mpItems,

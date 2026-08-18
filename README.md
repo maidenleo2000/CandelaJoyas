@@ -1,4 +1,4 @@
-# 🛍️ Genoveva InduStore - Guía de Configuración y Despliegue
+# 🛍️ Candela Joyas - Guía de Configuración y Despliegue
 
 Esta guía contiene los pasos necesarios para configurar, personalizar y desplegar la tienda.
 
@@ -46,9 +46,9 @@ El flujo de pago está configurado para redirigir automáticamente al dominio de
 
 ## 📧 Configuración de Emails (Resend)
 
-La tienda envía correos automáticos cuando el pago es **aprobado**.
+La tienda envía correos automáticos en dos momentos: al **crear el pedido** (confirmación de compra con número interno de referencia, ej. `VTA-000123`) y cuando el pago es **aprobado**.
 1. Registrate en [Resend.com](https://resend.com).
-2. Agrega tu dominio (ej: `genovevaindu.com.ar`).
+2. Agrega tu dominio (ej: `candelajoyas.com.ar`).
 3. Agrega los registros **DNS** (TXT, MX) que te pide Resend en tu proveedor de dominio.
 4. **DKIM:** Si tu proveedor de DNS te da error en el nombre, asegúrate de poner el dominio completo: `resend._domainkey.tu-dominio.com.ar`.
 5. Una vez verificado, actualiza la `RESEND_API_KEY` en `functions/.env`.
@@ -90,4 +90,4 @@ Para subir los cambios a internet, utiliza los siguientes comandos:
 
 ---
 
-Desarrollado con ❤️ para Genoveva InduStore.
+Desarrollado con ❤️ para Candela Joyas.
