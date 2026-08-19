@@ -135,7 +135,7 @@ export default function Footer() {
         <p className="footer-credit">
           Sitio web realizado por{' '}
           <a href="https://leandromartello.com.ar" target="_blank" rel="noopener noreferrer">
-            leandromartello.com.ar
+            Leandro Martello
           </a>
         </p>
       </div>

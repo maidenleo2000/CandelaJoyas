@@ -10,7 +10,6 @@ export class HttpError extends Error {
 
 const ADMIN_EMAILS = [
   "leandromartello1987@gmail.com",
-  "yesyrockmetal@gmail.com",
 ];
 
 export function getAdminClient() {
