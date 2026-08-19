@@ -11,8 +11,12 @@ export default function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const fetchUserRole = async (userId, email) => {
-    // Hardcoded Admin Emails for emergency access
-    const adminEmails = ['leandromartello1987@gmail.com'];
+    // Emails admin de emergencia, configurables por variable de entorno
+    // (respaldo si falla la consulta a profiles).
+    const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
 
     let role = 'client';
     let data = null;

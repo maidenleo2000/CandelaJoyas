@@ -1,4 +1,4 @@
-import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
+import { getCorsHeaders, makeJsonResponse } from "../_shared/cors.ts";
 import { getCorreoConfig } from "../_shared/correoConfig.ts";
 
 /**
@@ -17,6 +17,8 @@ import { getCorreoConfig } from "../_shared/correoConfig.ts";
 const MICORREO_QUOTE_URL = "https://api.correoargentino.com.ar/micorreo/v1/tarifas";
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("origin"));
+  const jsonResponse = makeJsonResponse(corsHeaders);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {

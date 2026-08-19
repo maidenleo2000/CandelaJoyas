@@ -1,10 +1,12 @@
-import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
+import { getCorsHeaders, makeJsonResponse } from "../_shared/cors.ts";
 
 // Disparada por el trigger on_sale_created_notify (ver 0013_sale_number_and_created_email.sql)
 // apenas se crea una venta. Confirma la recepción del pedido e informa
 // el número interno de venta como referencia (independiente del email
 // de "pago aprobado" que envía on-sale-approved-notify).
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("origin"));
+  const jsonResponse = makeJsonResponse(corsHeaders);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {

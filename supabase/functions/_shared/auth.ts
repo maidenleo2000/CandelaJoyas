@@ -8,9 +8,12 @@ export class HttpError extends Error {
   }
 }
 
-const ADMIN_EMAILS = [
-  "leandromartello1987@gmail.com",
-];
+function getAdminEmails(): string[] {
+  return (Deno.env.get("ADMIN_EMAILS") ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
 
 export function getAdminClient() {
   return createClient(
@@ -36,7 +39,7 @@ export async function requireAdmin(req: Request) {
   const { data: { user }, error } = await userClient.auth.getUser();
   if (error || !user) throw new HttpError(401, "Debes iniciar sesión.");
 
-  if (user.email && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+  if (user.email && getAdminEmails().includes(user.email.toLowerCase())) {
     return user;
   }
 

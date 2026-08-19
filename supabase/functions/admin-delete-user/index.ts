@@ -1,9 +1,11 @@
-import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
+import { getCorsHeaders, makeJsonResponse } from "../_shared/cors.ts";
 import { getAdminClient, HttpError, requireAdmin } from "../_shared/auth.ts";
 
 // Borra la cuenta de auth.users (no solo el perfil): requiere service_role,
 // por eso vive en una Edge Function. public.profiles se borra en cascada.
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("origin"));
+  const jsonResponse = makeJsonResponse(corsHeaders);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {

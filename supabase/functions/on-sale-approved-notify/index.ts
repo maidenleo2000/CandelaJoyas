@@ -1,8 +1,10 @@
-import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
+import { getCorsHeaders, makeJsonResponse } from "../_shared/cors.ts";
 
 // Disparada por el trigger on_sale_approved_notify (ver 0003_triggers_and_cron.sql)
 // cuando payment_status pasa a "approved".
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("origin"));
+  const jsonResponse = makeJsonResponse(corsHeaders);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {

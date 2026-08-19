@@ -1,9 +1,11 @@
-import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
+import { getCorsHeaders, makeJsonResponse } from "../_shared/cors.ts";
 import { getAdminClient } from "../_shared/auth.ts";
 import { sendPushToTokens } from "../_shared/fcm.ts";
 
 // Disparada por el trigger on_sale_created_notify (ver 0003_triggers_and_cron.sql)
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("origin"));
+  const jsonResponse = makeJsonResponse(corsHeaders);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {

@@ -1,9 +1,18 @@
 import { supabase } from './supabase';
 
 const PUBLIC_URL_MARKER = '/storage/v1/object/public/';
+const ALLOWED_MIME_PREFIXES = ['image/', 'video/'];
+const DEFAULT_MAX_SIZE_MB = 30;
 
 /** Sube un archivo a un bucket público y devuelve su URL pública. */
-export async function uploadFile(bucket, path, file) {
+export async function uploadFile(bucket, path, file, { maxSizeMB = DEFAULT_MAX_SIZE_MB } = {}) {
+  if (!ALLOWED_MIME_PREFIXES.some((prefix) => file.type?.startsWith(prefix))) {
+    throw new Error('Tipo de archivo no permitido. Solo se aceptan imágenes o videos.');
+  }
+  if (file.size > maxSizeMB * 1024 * 1024) {
+    throw new Error(`El archivo supera el tamaño máximo permitido (${maxSizeMB}MB).`);
+  }
+
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     cacheControl: '3600',
     upsert: false,

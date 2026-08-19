@@ -1,10 +1,12 @@
-import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
+import { getCorsHeaders, makeJsonResponse } from "../_shared/cors.ts";
 import { getAdminClient, HttpError, requireAdmin } from "../_shared/auth.ts";
 
 // Reemplaza el truco de "secondary Firebase app" de UsersTab.jsx: crear un
 // usuario con contraseña arbitraria requiere el service_role key, que nunca
 // puede viajar al cliente, así que esto vive en una Edge Function.
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("origin"));
+  const jsonResponse = makeJsonResponse(corsHeaders);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
