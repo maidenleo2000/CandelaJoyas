@@ -25,7 +25,7 @@ dist-ssr
 *.sln
 *.sw?
 # CI/CD
-.github/
+# .github/
 
 # Capacitor (Android generated assets)
 android/app/src/main/assets/public/

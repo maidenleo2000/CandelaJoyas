@@ -3,7 +3,7 @@
 // (Control_Stock_Cande, proyecto separado en Vercel que comparte este mismo
 // Supabase y llama a admin-create-user/admin-delete-user).
 const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
-  "https://candelajoyas.com.ar,https://localhost,https://stock.candelajoyas.com.ar")
+  "https://candelajoyas.com.ar,https://www.candelajoyas.com.ar,https://localhost,https://stock.candelajoyas.com.ar")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
