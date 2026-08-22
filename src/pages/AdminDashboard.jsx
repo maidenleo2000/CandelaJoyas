@@ -5,7 +5,7 @@ import { SettingsContext } from '../contexts/SettingsContext';
 import { supabase } from '../services/supabase';
 import { uploadFile, isStorageUrl, deleteFileByUrl } from '../services/storage';
 import toast from 'react-hot-toast';
-import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle, GalleryHorizontal, Truck, Wrench } from 'lucide-react';
+import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Palette, Type, User, Video, Layout, Link, MessageSquare, ShoppingBag, Calendar, Phone, Users, Key, Lock, LogOut, ClipboardCheck, ChevronDown, Filter, Megaphone, RotateCcw, Bell, Tag, Share2, BookOpen, Star, X, CreditCard, AlertTriangle, GalleryHorizontal, Truck, Wrench, BarChart3 } from 'lucide-react';
 import { useMaintenanceStatus } from '../hooks/useMaintenanceStatus';
 import { registerPush, unregisterPush } from '../services/pushNotifications';
 import { useProducts, fromRow as productFromRow } from '../hooks/useProducts';
@@ -13,6 +13,7 @@ import { useCategories } from '../hooks/useCategories';
 import SalesTab from './SalesTab';
 import EnviosTab from './EnviosTab';
 import UsersTab from './UsersTab';
+import MetricsTab from './MetricsTab';
 import AdminFaqs from '../components/admin/AdminFaqs';
 import CategoryManager from '../components/admin/CategoryManager';
 import MarketingTool from '../components/admin/MarketingTool';
@@ -78,7 +79,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
-    if (tab && ['products', 'sales', 'settings', 'myaccount', 'users', 'faqs', 'categories', 'marketing'].includes(tab)) {
+    if (tab && ['products', 'sales', 'settings', 'myaccount', 'users', 'faqs', 'categories', 'marketing', 'metrics'].includes(tab)) {
       setActiveTab(tab);
     }
   }, [location]);
@@ -1009,6 +1010,12 @@ export default function AdminDashboard() {
               <ShoppingBag size={20} /> Ventas
             </button>
             <button
+              className={`tab-btn ${activeTab === 'metrics' ? 'active' : ''}`}
+              onClick={() => setActiveTab('metrics')}
+            >
+              <BarChart3 size={20} /> Métricas
+            </button>
+            <button
               className={`tab-btn ${activeTab === 'envios' ? 'active' : ''}`}
               onClick={() => setActiveTab('envios')}
             >
@@ -1078,6 +1085,10 @@ export default function AdminDashboard() {
       
       {activeTab === 'sales' && userRole === 'admin' && (
         <SalesTab />
+      )}
+
+      {activeTab === 'metrics' && userRole === 'admin' && (
+        <MetricsTab />
       )}
 
       {activeTab === 'envios' && userRole === 'admin' && (

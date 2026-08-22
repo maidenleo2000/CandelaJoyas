@@ -21,6 +21,7 @@ import CartProvider from './contexts/CartContext';
 import SettingsProvider, { SettingsContext } from './contexts/SettingsContext';
 import { SearchProvider } from './contexts/SearchContext';
 import { useMaintenanceStatus } from './hooks/useMaintenanceStatus';
+import { useVisitorTracking } from './hooks/useVisitorTracking';
 import './App.css';
 
 function AppShell() {
@@ -31,6 +32,8 @@ function AppShell() {
 
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isAdmin = userRole === 'admin';
+
+  useVisitorTracking(!isAdminRoute);
 
   if (maintenanceActive && !isAdminRoute && !isAdmin) {
     return <MaintenancePage />;
