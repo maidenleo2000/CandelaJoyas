@@ -94,7 +94,7 @@ export default function Footer() {
             <ul>
               <li><Link to="/">Inicio</Link></li>
               <li><Link to="/">Catálogo</Link></li>
-              <li><Link to="/nosotras">Nosotras</Link></li>
+              <li><Link to="/nosotras">Sobre Nosotros</Link></li>
               <li><a href="#contact">Contacto</a></li>
             </ul>
           </div>

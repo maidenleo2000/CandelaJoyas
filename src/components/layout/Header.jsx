@@ -117,7 +117,7 @@ export default function Header() {
             </div>
 
             {settings.showAbout && (
-              <Link to="/nosotras" className="mobile-nav-link" onClick={closeMenu}>Nosotras</Link>
+              <Link to="/nosotras" className="mobile-nav-link" onClick={closeMenu}>Sobre Nosotros</Link>
             )}
             <Link to="/como-comprar" className="mobile-nav-link" onClick={closeMenu}>¿Cómo comprar?</Link>
             {currentUser && (
@@ -189,7 +189,7 @@ export default function Header() {
             </div>
 
             {settings.showAbout && (
-              <Link to="/nosotras" className="nav-link">Nosotras</Link>
+              <Link to="/nosotras" className="nav-link">Sobre Nosotros</Link>
             )}
             <Link to="/como-comprar" className="nav-link">Cómo Comprar</Link>
           </nav>

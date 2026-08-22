@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ShoppingBag, ShoppingCart, UserCheck, MessageCircle, ChevronRight } from 'lucide-react';
+import { ShoppingBag, ShoppingCart, UserCheck, MessageCircle, CreditCard, Truck } from 'lucide-react';
 import { supabase } from '../services/supabase';
 import { SettingsContext } from '../contexts/SettingsContext';
 import PageHeader from '../components/common/PageHeader';
@@ -40,6 +40,17 @@ export default function HowToBuy() {
     };
   }, []);
 
+  const enableWhatsApp = settings?.enableWhatsApp !== false;
+  const enableMercadoPago = settings?.enableMercadoPago === true;
+  const enableShippingOptions = settings?.enableMercadoEnvios || settings?.enableCorreoArgentino;
+  const bothPaymentMethods = enableWhatsApp && enableMercadoPago;
+
+  const paymentDescription = bothPaymentMethods
+    ? "Elegí cómo pagar: por WhatsApp (para coordinar el pago con nosotros) o de forma segura con Mercado Pago (tarjetas o dinero en cuenta)."
+    : enableMercadoPago
+      ? "Pagá de forma segura con Mercado Pago: tarjetas de crédito, débito o dinero en cuenta."
+      : "Coordiná el pago con nosotros directamente por WhatsApp.";
+
   const steps = [
     {
       icon: <ShoppingBag size={32} />,
@@ -54,12 +65,24 @@ export default function HowToBuy() {
     {
       icon: <UserCheck size={32} />,
       title: "3. Completá tus datos",
-      description: "Entrá al carrito, revisá tu pedido y completá tu nombre y teléfono. No necesitás crear una cuenta."
+      description: "Entrá al carrito, revisá tu pedido y completá tu nombre y teléfono. No necesitás crear una cuenta, pero si querés hacer seguimiento de tu pedido más adelante podés crear una en este paso."
     },
     {
+      icon: <CreditCard size={32} />,
+      title: "4. Elegí cómo pagar",
+      description: paymentDescription
+    },
+    ...(enableMercadoPago && enableShippingOptions ? [{
+      icon: <Truck size={32} />,
+      title: "5. Elegí cómo recibirlo",
+      description: "Si pagás con Mercado Pago, podés coordinar la entrega con nosotros, o elegir envío a domicilio por Mercado Envíos o Correo Argentino (el costo se calcula automáticamente según tu código postal)."
+    }] : []),
+    {
       icon: <MessageCircle size={32} />,
-      title: "4. Finalizá por WhatsApp",
-      description: "Hacé click en 'Enviar pedido'. Se abrirá un chat de WhatsApp con nosotros con todo el detalle de tu compra para coordinar pago y envío."
+      title: `${enableMercadoPago && enableShippingOptions ? '6' : '5'}. Confirmá tu pedido`,
+      description: enableWhatsApp
+        ? "Hacé click en 'Confirmar Pedido'. Si elegiste WhatsApp, se abrirá un chat con nosotros con el detalle de tu compra; si elegiste Mercado Pago, te llevamos directo a pagar de forma segura."
+        : "Hacé click en 'Confirmar Pedido' y te llevamos directo a Mercado Pago para completar el pago de forma segura."
     }
   ];
 
@@ -82,9 +105,6 @@ export default function HowToBuy() {
               <h3>{step.title}</h3>
               <p>{step.description}</p>
             </div>
-            <div className="step-connector desktop-only">
-              <ChevronRight size={24} />
-            </div>
           </div>
         ))}
       </div>
@@ -92,7 +112,8 @@ export default function HowToBuy() {
       {faqs.length > 0 && (
         <div className="faq-section glass">
           <h2>Preguntas Frecuentes</h2>
-          <div 
+          <p className="faq-section-subtitle">Todo lo que necesitás saber antes de comprar</p>
+          <div
             className="faq-grid" 
             style={{ "--faq-cols": settings.faqColumns }}
           >

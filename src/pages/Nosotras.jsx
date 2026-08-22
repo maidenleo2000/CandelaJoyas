@@ -9,7 +9,7 @@ export default function Nosotras() {
   
   useEffect(() => {
     const baseTitle = settings.siteTitle || 'Candela Joyas';
-    document.title = `${settings.aboutTitle || 'Nosotras'} | ${baseTitle}`;
+    document.title = `${settings.aboutTitle || 'Sobre Nosotros'} | ${baseTitle}`;
   }, [settings.siteTitle, settings.aboutTitle]);
 
   if (!settings.showAbout) {
@@ -22,7 +22,7 @@ export default function Nosotras() {
 
   return (
     <div className="nosotras-page animate-fade-in">
-      <PageHeader title={settings.aboutTitle || 'Nosotras'} />
+      <PageHeader title={settings.aboutTitle || 'Sobre Nosotros'} />
 
       <section className="container nosotras-content">
         <div className="about-card glass">
