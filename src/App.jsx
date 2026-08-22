@@ -22,6 +22,7 @@ import SettingsProvider, { SettingsContext } from './contexts/SettingsContext';
 import { SearchProvider } from './contexts/SearchContext';
 import { useMaintenanceStatus } from './hooks/useMaintenanceStatus';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
+import { usePageViewTracking } from './hooks/usePageViewTracking';
 import './App.css';
 
 function AppShell() {
@@ -33,7 +34,8 @@ function AppShell() {
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isAdmin = userRole === 'admin';
 
-  useVisitorTracking(!isAdminRoute);
+  useVisitorTracking(!isAdminRoute && !isAdmin);
+  usePageViewTracking(!isAdminRoute && !isAdmin);
 
   if (maintenanceActive && !isAdminRoute && !isAdmin) {
     return <MaintenancePage />;

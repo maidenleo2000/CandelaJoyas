@@ -1,12 +1,173 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { supabase } from '../services/supabase';
 import { AuthContext } from '../contexts/AuthContext';
-import { Users, TrendingUp } from 'lucide-react';
+import { Users, TrendingUp, FileText, Package } from 'lucide-react';
 import './MetricsTab.css';
 
 function formatDateShort(isoDate) {
   const [, month, day] = isoDate.split('-');
   return `${day}/${month}`;
+}
+
+const STATIC_PAGE_LABELS = {
+  '/': 'Inicio',
+  '/nosotras': 'Sobre Nosotras',
+  '/como-comprar': 'Cómo Comprar',
+  '/mi-cuenta': 'Mi Cuenta',
+  '/success': 'Compra Exitosa',
+};
+
+function labelForPath(path) {
+  if (STATIC_PAGE_LABELS[path]) return STATIC_PAGE_LABELS[path];
+  if (path.startsWith('/product/')) return 'Producto (detalle)';
+  return path;
+}
+
+const DATE_RANGE_OPTIONS = [
+  { value: 'today', label: 'Hoy' },
+  { value: '7d', label: 'Últimos 7 días' },
+  { value: '30d', label: 'Últimos 30 días' },
+  { value: 'all', label: 'Todo' },
+];
+
+function dateFromForRange(range) {
+  if (range === 'all') return null;
+  const days = range === 'today' ? 0 : range === '7d' ? 6 : 29;
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString().slice(0, 10);
+}
+
+function TopVisitedSection() {
+  const [dateRange, setDateRange] = useState('7d');
+  const [sortBy, setSortBy] = useState('views');
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    const fetchRows = async () => {
+      let query = supabase
+        .from('page_views')
+        .select('path, product_id, visitor_id, products(name)')
+        .order('viewed_at', { ascending: false })
+        .limit(5000);
+      const dateFrom = dateFromForRange(dateRange);
+      if (dateFrom) query = query.gte('visit_date', dateFrom);
+
+      const { data, error } = await query;
+      if (cancelled) return;
+
+      if (error) {
+        console.error('Error fetching page views:', error);
+      } else {
+        setRows(data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchRows();
+
+    const channel = supabase
+      .channel(`page_views_admin-${Math.random().toString(36).slice(2)}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'page_views' }, () => fetchRows())
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [dateRange]);
+
+  const topPages = useMemo(() => {
+    const map = new Map();
+    rows.forEach(row => {
+      const entry = map.get(row.path) || { key: row.path, label: labelForPath(row.path), views: 0, visitors: new Set() };
+      entry.views += 1;
+      entry.visitors.add(row.visitor_id);
+      map.set(row.path, entry);
+    });
+    return Array.from(map.values())
+      .map(e => ({ key: e.key, label: e.label, views: e.views, uniqueVisitors: e.visitors.size }))
+      .sort((a, b) => sortBy === 'views' ? b.views - a.views : b.uniqueVisitors - a.uniqueVisitors)
+      .slice(0, 10);
+  }, [rows, sortBy]);
+
+  const topProducts = useMemo(() => {
+    const map = new Map();
+    rows.forEach(row => {
+      if (!row.product_id) return;
+      const entry = map.get(row.product_id) || {
+        key: row.product_id,
+        label: row.products?.name || 'Producto eliminado',
+        views: 0,
+        visitors: new Set(),
+      };
+      entry.views += 1;
+      entry.visitors.add(row.visitor_id);
+      map.set(row.product_id, entry);
+    });
+    return Array.from(map.values())
+      .map(e => ({ key: e.key, label: e.label, views: e.views, uniqueVisitors: e.visitors.size }))
+      .sort((a, b) => sortBy === 'views' ? b.views - a.views : b.uniqueVisitors - a.uniqueVisitors)
+      .slice(0, 10);
+  }, [rows, sortBy]);
+
+  return (
+    <div className="metrics-top-section">
+      <div className="metrics-filters">
+        <select value={dateRange} onChange={e => setDateRange(e.target.value)}>
+          {DATE_RANGE_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+          <option value="views">Ordenar por vistas</option>
+          <option value="unique">Ordenar por visitantes únicos</option>
+        </select>
+      </div>
+
+      {loading ? (
+        <p className="metrics-empty">Cargando ranking...</p>
+      ) : (
+        <div className="metrics-top-grid">
+          <div className="metrics-top-card">
+            <h3><FileText size={18} /> Páginas más visitadas</h3>
+            {topPages.length === 0 ? (
+              <p className="metrics-empty">Sin datos para este período.</p>
+            ) : (
+              <ol className="metrics-top-list">
+                {topPages.map(item => (
+                  <li key={item.key}>
+                    <span className="metrics-top-label">{item.label}</span>
+                    <span className="metrics-top-value">{sortBy === 'views' ? `${item.views} vistas` : `${item.uniqueVisitors} visitantes`}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+
+          <div className="metrics-top-card">
+            <h3><Package size={18} /> Productos más visitados</h3>
+            {topProducts.length === 0 ? (
+              <p className="metrics-empty">Sin datos para este período.</p>
+            ) : (
+              <ol className="metrics-top-list">
+                {topProducts.map(item => (
+                  <li key={item.key}>
+                    <span className="metrics-top-label">{item.label}</span>
+                    <span className="metrics-top-value">{sortBy === 'views' ? `${item.views} vistas` : `${item.uniqueVisitors} visitantes`}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function MetricsTab() {
@@ -100,6 +261,8 @@ export default function MetricsTab() {
           </ul>
         )}
       </div>
+
+      <TopVisitedSection />
     </div>
   );
 }

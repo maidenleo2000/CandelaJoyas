@@ -1,17 +1,8 @@
 import { useEffect } from 'react';
 import { supabase } from '../services/supabase';
+import { getOrCreateVisitorId } from '../utils/visitorId';
 
-const VISITOR_ID_KEY = 'tc_visitor_id';
 const SESSION_FLAG_KEY = 'tc_visit_logged';
-
-function getOrCreateVisitorId() {
-  let id = localStorage.getItem(VISITOR_ID_KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(VISITOR_ID_KEY, id);
-  }
-  return id;
-}
 
 export function useVisitorTracking(enabled) {
   useEffect(() => {
