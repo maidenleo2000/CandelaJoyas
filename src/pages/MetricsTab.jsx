@@ -84,10 +84,15 @@ function TopVisitedSection() {
   const topPages = useMemo(() => {
     const map = new Map();
     rows.forEach(row => {
-      const entry = map.get(row.path) || { key: row.path, label: labelForPath(row.path), views: 0, visitors: new Set() };
+      const isProductPage = Boolean(row.product_id);
+      const key = isProductPage ? `product:${row.product_id}` : row.path;
+      const label = isProductPage
+        ? `Producto: ${row.products?.name || 'Producto eliminado'}`
+        : labelForPath(row.path);
+      const entry = map.get(key) || { key, label, views: 0, visitors: new Set() };
       entry.views += 1;
       entry.visitors.add(row.visitor_id);
-      map.set(row.path, entry);
+      map.set(key, entry);
     });
     return Array.from(map.values())
       .map(e => ({ key: e.key, label: e.label, views: e.views, uniqueVisitors: e.visitors.size }))
