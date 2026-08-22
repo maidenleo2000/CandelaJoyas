@@ -219,12 +219,17 @@
 
 .header-search-wrapper input {
   border: none;
+  border-radius: 0;
   background: transparent;
   width: 100%;
   height: 100%;
   font-size: 0.9rem;
   outline: none;
   color: var(--text-main);
+}
+
+.header-search-wrapper input:focus {
+  box-shadow: none;
 }
 
 .header-search-wrapper .clear-btn {
