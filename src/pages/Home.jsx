@@ -7,6 +7,7 @@ import { useSearch } from '../contexts/SearchContext';
 import { Filter, ChevronDown } from 'lucide-react';
 import VideoSlider from '../components/common/VideoSlider';
 import SidebarCarousel from '../components/common/SidebarCarousel';
+import { pluralizeEs } from '../utils/labels';
 import './Home.css';
 
 export default function Home() {
@@ -254,7 +255,7 @@ export default function Home() {
                     onChange={(e) => setSelectedColor(e.target.value)}
                     className="sort-select"
                   >
-                    <option value="All">Todos los Colores</option>
+                    <option value="All">Todos los {pluralizeEs(settings.colorLabel || 'Color')}</option>
                     {availableColors.filter(c => c !== 'All').map(color => (
                       <option key={color} value={color}>{color}</option>
                     ))}
@@ -272,7 +273,7 @@ export default function Home() {
                     onChange={(e) => setSelectedSize(e.target.value)}
                     className="sort-select"
                   >
-                    <option value="All">Todos los Talles</option>
+                    <option value="All">Todos los {pluralizeEs(settings.sizeLabel || 'Talle')}</option>
                     {availableSizes.filter(s => s !== 'All').map(size => (
                       <option key={size} value={size}>{size}</option>
                     ))}

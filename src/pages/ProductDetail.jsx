@@ -359,7 +359,7 @@ export default function ProductDetail() {
             {/* Color Selection */}
             {product.colors && product.colors.length > 0 && (
               <div className="selector-group">
-                <h4>Color</h4>
+                <h4>{settings.colorLabel || 'Color'}</h4>
                 <div className="options-container">
                   {product.colors.map(color => (
                     <button 
@@ -377,7 +377,7 @@ export default function ProductDetail() {
             {/* Size Selection */}
             {product.sizes && product.sizes.length > 0 && (
               <div className="selector-group">
-                <h4>Talle</h4>
+                <h4>{settings.sizeLabel || 'Talle'}</h4>
                 <div className="options-container">
                   {product.sizes.map(size => (
                     <button 
@@ -398,13 +398,14 @@ export default function ProductDetail() {
             {(() => {
               // Stock actual para la variante seleccionada (talle o color, según el modo del producto)
               const isColorMode = product.stockMode === 'color';
-              const variantSelected = hasVariantSelected(product.stockMode, { size: selectedSize, color: selectedColor });
+              const variantSelected = hasVariantSelected(product.stockMode, product.colors, product.sizes, { size: selectedSize, color: selectedColor });
               let availableStock = 999;
               if (settings.enableStockManagement && product.stock && variantSelected) {
-                const stockKey = getStockKey(product.stockMode, product.colors, { size: selectedSize, color: selectedColor });
+                const stockKey = getStockKey(product.stockMode, product.colors, product.sizes, { size: selectedSize, color: selectedColor });
                 availableStock = product.stock[stockKey] !== undefined ? product.stock[stockKey] : 0;
               }
               const isOutOfStock = settings.enableStockManagement && variantSelected && availableStock <= 0;
+              const noVariants = !(product.colors?.length > 0) && !(product.sizes?.length > 0);
 
               return (
                 <>
@@ -434,11 +435,11 @@ export default function ProductDetail() {
                     <div className="stock-info animate-fade-in" style={{ marginBottom: '1rem' }}>
                       {availableStock > 0 ? (
                         <span className="stock-badge available" style={{ fontSize: '0.85rem', color: 'var(--color-dark)', fontWeight: '500', background: 'var(--color-secondary)', padding: '0.3rem 0.7rem', borderRadius: 'var(--radius-sm)', display: 'inline-block' }}>
-                          ¡Stock disponible! ({availableStock} unidades {(!isColorMode && selectedColor) ? `en color ${selectedColor}` : ''})
+                          ¡Stock disponible! ({availableStock} unidades {(!isColorMode && selectedColor) ? `en ${(settings.colorLabel || 'color').toLowerCase()} ${selectedColor}` : ''})
                         </span>
                       ) : (
                         <span className="stock-badge out-of-stock" style={{ fontSize: '0.85rem', color: '#dc2626', fontWeight: 'bold' }}>
-                          Agotado {isColorMode ? `en color ${selectedColor}` : (selectedColor ? `en ${selectedColor}` : 'en este talle')}
+                          Agotado {noVariants ? '' : (isColorMode ? `en ${(settings.colorLabel || 'color').toLowerCase()} ${selectedColor}` : (selectedColor ? `en ${selectedColor}` : `en este ${(settings.sizeLabel || 'talle').toLowerCase()}`))}
                         </span>
                       )}
                     </div>

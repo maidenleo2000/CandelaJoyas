@@ -79,6 +79,10 @@ export default function SettingsProvider({ children }) {
     // Home Filters Settings
     showColorFilter: true,
     showSizeFilter: true,
+    // Nombres editables de las variaciones de producto (por defecto Color/Talle,
+    // pero cada tienda puede renombrarlas: ej. "Letra", "Medida")
+    colorLabel: 'Color',
+    sizeLabel: 'Talle',
     // Maintenance Mode Settings
     maintenanceMode: false,
     maintenanceTitle: 'Sitio en Mantenimiento',

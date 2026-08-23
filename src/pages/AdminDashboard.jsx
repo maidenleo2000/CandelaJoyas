@@ -9,6 +9,7 @@ import { Edit2, Trash2, Image as ImageIcon, UploadCloud, Settings, Package, Pale
 import { useMaintenanceStatus } from '../hooks/useMaintenanceStatus';
 import { registerPush, unregisterPush } from '../services/pushNotifications';
 import { useProducts, fromRow as productFromRow } from '../hooks/useProducts';
+import { pluralizeEs } from '../utils/labels';
 import { useCategories } from '../hooks/useCategories';
 import SalesTab from './SalesTab';
 import EnviosTab from './EnviosTab';
@@ -71,7 +72,10 @@ export default function AdminDashboard() {
   const { products, loading: productsLoading, refetch: refetchProducts, setProducts } = useProducts();
   const { categories, loading: categoriesLoading, setCategories } = useCategories();
   const { settings, updateSettings } = useContext(SettingsContext);
-  
+  // Nombres de las variaciones (editables por tienda; por defecto Color/Talle)
+  const colorLabel = settings.colorLabel || 'Color';
+  const sizeLabel = settings.sizeLabel || 'Talle';
+
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'settings'
   const [activeSettingsTab, setActiveSettingsTab] = useState('identity'); // 'identity', 'hero', 'marquee', 'videos', 'sidebar', 'checkout', 'footer', 'about'
   const location = useLocation();
@@ -176,6 +180,8 @@ export default function AdminDashboard() {
     marqueeHeight: '36',
     showColorFilter: true,
     showSizeFilter: true,
+    colorLabel: 'Color',
+    sizeLabel: 'Talle',
     maintenanceMode: false,
     maintenanceTitle: 'Sitio en Mantenimiento',
     maintenanceMessage: '',
@@ -740,7 +746,10 @@ export default function AdminDashboard() {
       const cleanedStock = {};
 
       if (formData.stock) {
-        if (formData.stockMode === 'color') {
+        if (currentSizes.length === 0 && currentColors.length === 0) {
+          // Sin variantes: un único valor de stock bajo la clave "unico"
+          cleanedStock.unico = formData.stock.unico !== undefined ? formData.stock.unico : 0;
+        } else if (formData.stockMode === 'color') {
           // Solo color
           currentColors.forEach(color => {
             if (formData.stock[color] !== undefined) {
@@ -1597,12 +1606,12 @@ export default function AdminDashboard() {
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Colores (separados por coma)</label>
+                      <label>{pluralizeEs(colorLabel)} (separados por coma)</label>
                       <input name="colors" value={formData.colors} onChange={handleInputChange} placeholder="Rojo, Azul, Beig" />
                     </div>
                     {formData.stockMode !== 'color' && (
                       <div className="form-group">
-                        <label>Talles (separados por coma)</label>
+                        <label>{pluralizeEs(sizeLabel)} (separados por coma)</label>
                         <input name="sizes" value={formData.sizes} onChange={handleInputChange} placeholder="S, M, L, XL" />
                       </div>
                     )}
@@ -1614,37 +1623,62 @@ export default function AdminDashboard() {
                         <Package size={18} /> Gestión de Stock
                       </label>
                       <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '1rem' }}>
-                        Elegí en base a qué atributo se controla el stock de este producto.
+                        {(!formData.colors && !formData.sizes)
+                          ? `Este producto no tiene ${colorLabel.toLowerCase()} ni ${sizeLabel.toLowerCase()}: cargá directamente la cantidad en stock.`
+                          : 'Elegí en base a qué atributo se controla el stock de este producto.'}
                       </p>
 
-                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                        <button
-                          type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, stockMode: 'talle' }))}
-                          className={`btn ${formData.stockMode !== 'color' ? 'btn-primary' : 'btn-outline'}`}
-                          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
-                        >
-                          Por Talle
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, stockMode: 'color' }))}
-                          className={`btn ${formData.stockMode === 'color' ? 'btn-primary' : 'btn-outline'}`}
-                          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
-                        >
-                          Por Color
-                        </button>
-                      </div>
+                      {(formData.colors || formData.sizes) && (
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, stockMode: 'talle' }))}
+                            className={`btn ${formData.stockMode !== 'color' ? 'btn-primary' : 'btn-outline'}`}
+                            style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                          >
+                            Por {sizeLabel}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, stockMode: 'color' }))}
+                            className={`btn ${formData.stockMode === 'color' ? 'btn-primary' : 'btn-outline'}`}
+                            style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                          >
+                            Por {colorLabel}
+                          </button>
+                        </div>
+                      )}
 
-                      {formData.stockMode === 'color' ? (
+                      {(!formData.colors && !formData.sizes) ? (
+                        <div style={{ background: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                          <div className="stock-input-group" style={{ maxWidth: '160px' }}>
+                            <label style={{ fontSize: '0.7rem', color: '#666' }}>Stock</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={formData.stock?.unico || 0}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value) || 0;
+                                setFormData(prev => ({
+                                  ...prev,
+                                  stock: {
+                                    ...(prev.stock || {}),
+                                    unico: val
+                                  }
+                                }));
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ) : formData.stockMode === 'color' ? (
                         !formData.colors ? (
-                          <p style={{ fontSize: '0.85rem', color: '#dc2626' }}>Primero debes ingresar los colores arriba (ej: Dorado, Plateado).</p>
+                          <p style={{ fontSize: '0.85rem', color: '#dc2626' }}>Primero debes ingresar {pluralizeEs(colorLabel).toLowerCase()} arriba (ej: Dorado, Plateado).</p>
                         ) : (
                           <div style={{ background: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem' }}>
                               {formData.colors.split(',').map(c => c.trim()).filter(Boolean).map(color => (
                                 <div key={color} className="stock-input-group">
-                                  <label style={{ fontSize: '0.7rem', color: '#666' }}>Color: {color}</label>
+                                  <label style={{ fontSize: '0.7rem', color: '#666' }}>{colorLabel}: {color}</label>
                                   <input
                                     type="number"
                                     min="0"
@@ -1667,13 +1701,13 @@ export default function AdminDashboard() {
                         )
                       ) : (
                         !formData.sizes ? (
-                          <p style={{ fontSize: '0.85rem', color: '#dc2626' }}>Primero debes ingresar los talles arriba (ej: S, M, L).</p>
+                          <p style={{ fontSize: '0.85rem', color: '#dc2626' }}>Primero debes ingresar {pluralizeEs(sizeLabel).toLowerCase()} arriba (ej: S, M, L).</p>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {formData.sizes.split(',').map(s => s.trim()).filter(Boolean).map(size => (
                               <div key={size} style={{ background: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
                                 <h4 style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: 'var(--color-primary)', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
-                                  Talle: {size}
+                                  {sizeLabel}: {size}
                                 </h4>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem' }}>
@@ -1699,7 +1733,7 @@ export default function AdminDashboard() {
                                   ) : (
                                     formData.colors.split(',').map(c => c.trim()).filter(Boolean).map(color => (
                                       <div key={`${size}_${color}`} className="stock-input-group">
-                                        <label style={{ fontSize: '0.7rem', color: '#666' }}>Color: {color}</label>
+                                        <label style={{ fontSize: '0.7rem', color: '#666' }}>{colorLabel}: {color}</label>
                                         <input
                                           type="number"
                                           min="0"
@@ -2370,7 +2404,7 @@ export default function AdminDashboard() {
                         checked={siteSettings.showColorFilter !== false}
                         onChange={handleSettingsChange}
                       />
-                      Mostrar filtro de Colores
+                      Mostrar filtro de {pluralizeEs(siteSettings.colorLabel || 'Color')}
                     </label>
                   </div>
 
@@ -2382,8 +2416,26 @@ export default function AdminDashboard() {
                         checked={siteSettings.showSizeFilter !== false}
                         onChange={handleSettingsChange}
                       />
-                      Mostrar filtro de Talles
+                      Mostrar filtro de {pluralizeEs(siteSettings.sizeLabel || 'Talle')}
                     </label>
+                  </div>
+                </div>
+
+                <div className="settings-section">
+                  <h3><Tag size={18} /> Nombres de las Variaciones</h3>
+                  <p className="text-muted" style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                    Cambiá cómo se llaman "Color" y "Talle" en toda la tienda (formulario de productos, ficha de producto, carrito, WhatsApp, etc.). Por ejemplo, podés usar "Letra" en vez de "Color" o "Medida" en vez de "Talle".
+                  </p>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Nombre para "Color"</label>
+                      <input name="colorLabel" value={siteSettings.colorLabel || ''} onChange={handleSettingsChange} placeholder="Color" />
+                    </div>
+                    <div className="form-group">
+                      <label>Nombre para "Talle"</label>
+                      <input name="sizeLabel" value={siteSettings.sizeLabel || ''} onChange={handleSettingsChange} placeholder="Talle" />
+                    </div>
                   </div>
                 </div>
               </div>

@@ -42,21 +42,23 @@ export default function CartDrawer({ isOpen, onClose }) {
         for (const item of cart) {
           const { data: productData } = await supabase
             .from('products')
-            .select('colors, stock, stock_mode')
+            .select('colors, sizes, stock, stock_mode')
             .eq('id', item.id)
             .single();
 
           if (productData) {
-            // Determinamos la key de stock según el modo del producto (talle, talle_color o color)
-            const stockKey = getStockKey(productData.stock_mode, productData.colors, { size: item.selectedSize, color: item.selectedColor });
+            // Determinamos la key de stock según el modo del producto (talle, talle_color, color o unico)
+            const stockKey = getStockKey(productData.stock_mode, productData.colors, productData.sizes, { size: item.selectedSize, color: item.selectedColor });
             const currentStock = productData.stock?.[stockKey] || 0;
 
             if (currentStock < item.quantity) {
               const hasColors = productData.colors && productData.colors.length > 0;
-              const variantLabel = productData.stock_mode === 'color'
-                ? item.selectedColor
-                : (hasColors ? `${item.selectedSize} - ${item.selectedColor}` : item.selectedSize);
-              toast.error(`Lo sentimos, solo quedan ${currentStock} unidades de "${item.name}" (Variante: ${variantLabel})`);
+              const variantLabel = stockKey === 'unico'
+                ? null
+                : (productData.stock_mode === 'color'
+                  ? item.selectedColor
+                  : (hasColors ? `${item.selectedSize} - ${item.selectedColor}` : item.selectedSize));
+              toast.error(`Lo sentimos, solo quedan ${currentStock} unidades de "${item.name}"${variantLabel ? ` (Variante: ${variantLabel})` : ''}`);
               setIsSubmitting(false);
               return;
             }
@@ -125,11 +127,15 @@ export default function CartDrawer({ isOpen, onClose }) {
       // Handle WhatsApp logic
       if (customerData.paymentMethod === 'whatsapp') {
         // ... existing whatsapp logic ...
+        const sizeLabel = settings.sizeLabel || 'Talle';
+        const colorLabel = settings.colorLabel || 'Color';
         const orderList = cart
-          .map(
-            (item) =>
-              `• ${item.name} x${item.quantity}\n  Talle: ${item.selectedSize || "-"}\n  Color: ${item.selectedColor || "-"}\n  Subtotal: $${(item.price * item.quantity).toLocaleString()}`,
-          )
+          .map((item) => {
+            const variantLines = (item.selectedSize || item.selectedColor)
+              ? `\n  ${sizeLabel}: ${item.selectedSize || "-"}\n  ${colorLabel}: ${item.selectedColor || "-"}`
+              : '';
+            return `• ${item.name} x${item.quantity}${variantLines}\n  Subtotal: $${(item.price * item.quantity).toLocaleString()}`;
+          })
           .join("\n\n");
 
         const message =
@@ -265,10 +271,10 @@ export default function CartDrawer({ isOpen, onClose }) {
 
                     <p className="item-variant">
                       {item.selectedColor && (
-                        <span>Color: {item.selectedColor}</span>
+                        <span>{settings.colorLabel || 'Color'}: {item.selectedColor}</span>
                       )}
                       {item.selectedSize && (
-                        <span> / Talle: {item.selectedSize}</span>
+                        <span> / {settings.sizeLabel || 'Talle'}: {item.selectedSize}</span>
                       )}
                     </p>
 
@@ -288,7 +294,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                         <button
                           onClick={() => {
                             if (settings.enableStockManagement) {
-                              const stockKey = getStockKey(item.stockMode, item.colors, { size: item.selectedSize, color: item.selectedColor });
+                              const stockKey = getStockKey(item.stockMode, item.colors, item.sizes, { size: item.selectedSize, color: item.selectedColor });
                               const currentStock = item.stock?.[stockKey] || 0;
                               
                               if (item.quantity >= currentStock) {

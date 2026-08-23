@@ -571,7 +571,7 @@ export default function SalesTab() {
                     <div key={idx} className="sale-item-row">
                       <div className="item-info">
                         <strong>{item.name}</strong>
-                        <span>Talle: {item.selectedSize || '-'} | Color: {item.selectedColor || '-'}</span>
+                        <span>{settings.sizeLabel || 'Talle'}: {item.selectedSize || '-'} | {settings.colorLabel || 'Color'}: {item.selectedColor || '-'}</span>
                       </div>
                       <div className="item-price">
                         {item.quantity} x ${item.price?.toLocaleString()}
