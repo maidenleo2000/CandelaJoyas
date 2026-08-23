@@ -511,9 +511,15 @@
   color: var(--color-dark);
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type="checkbox"],
+.checkbox-label input[type="radio"] {
   width: 22px;
   height: 22px;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 0;
+  flex-shrink: 0;
   cursor: pointer;
   accent-color: var(--color-primary);
 }
