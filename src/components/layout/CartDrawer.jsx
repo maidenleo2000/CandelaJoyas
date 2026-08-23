@@ -6,6 +6,7 @@ import { X, ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { supabase } from "../../services/supabase";
 import { getStockKey } from "../../utils/stock";
+import { getFeaturedPrice, getSecondaryPrice, getPriceForPaymentMethod, getCashPrice, getInstallmentPrice } from "../../utils/pricing";
 import CheckoutModal from "./CheckoutModal";
 import "./CartDrawer.css";
 
@@ -15,9 +16,9 @@ export default function CartDrawer({ isOpen, onClose }) {
     removeFromCart,
     addToCart,
     removeItemCompletely,
-    cartTotal,
     cartCount,
-    clearCart
+    clearCart,
+    getTotalForMethod
   } = useContext(CartContext);
   const { settings } = useContext(SettingsContext);
   const { currentUser, register } = useContext(AuthContext);
@@ -91,6 +92,7 @@ export default function CartDrawer({ isOpen, onClose }) {
       // la venta (RLS lo permite) pero no puede leerla de vuelta con
       // .select(), así que no podemos depender de que la DB nos devuelva el id.
       const saleId = crypto.randomUUID();
+      const orderTotal = getTotalForMethod(customerData.paymentMethod);
       const saleData = {
         id: saleId,
         user_id: effectiveUserId,
@@ -100,12 +102,12 @@ export default function CartDrawer({ isOpen, onClose }) {
         items: cart.map(item => ({
           id: item.id || '',
           name: item.name || 'Producto',
-          price: Number(item.price) || 0,
+          price: Number(getPriceForPaymentMethod(item, customerData.paymentMethod)) || 0,
           quantity: Number(item.quantity) || 1,
           selectedColor: item.selectedColor || null,
           selectedSize: item.selectedSize || null
         })),
-        total: Number(cartTotal) || 0,
+        total: Number(orderTotal) || 0,
         status: 'Pendiente',
         payment_method: customerData.paymentMethod || 'whatsapp',
         payment_status: customerData.paymentMethod === 'mercadopago' ? 'pending' : 'not_applicable',
@@ -134,7 +136,7 @@ export default function CartDrawer({ isOpen, onClose }) {
             const variantLines = (item.selectedSize || item.selectedColor)
               ? `\n  ${sizeLabel}: ${item.selectedSize || "-"}\n  ${colorLabel}: ${item.selectedColor || "-"}`
               : '';
-            return `• ${item.name} x${item.quantity}${variantLines}\n  Subtotal: $${(item.price * item.quantity).toLocaleString()}`;
+            return `• ${item.name} x${item.quantity}${variantLines}\n  Subtotal: $${(getCashPrice(item) * item.quantity).toLocaleString()}`;
           })
           .join("\n\n");
 
@@ -143,7 +145,7 @@ export default function CartDrawer({ isOpen, onClose }) {
           `${customerData.customerPhone ? `Tel: ${customerData.customerPhone}\n` : ''}\n` +
           `*EMPRESA: ${settings.siteTitle}*\n\n` +
           `${orderList}\n\n` +
-          `*TOTAL: $${cartTotal.toLocaleString()}*\n\n` +
+          `*TOTAL (Efectivo/Transferencia): $${orderTotal.toLocaleString()}*\n\n` +
           `Por favor, confirmar disponibilidad para continuar con el pago.`;
 
         const whatsappUrl = `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -168,7 +170,7 @@ export default function CartDrawer({ isOpen, onClose }) {
               items: cart.map(item => ({
                 id: item.id,
                 name: item.name,
-                price: item.price,
+                price: getInstallmentPrice(item),
                 quantity: item.quantity,
                 imageUrl: item.imageUrl,
                 selectedColor: item.selectedColor
@@ -311,9 +313,20 @@ export default function CartDrawer({ isOpen, onClose }) {
                           <Plus size={14} />
                         </button>
                       </div>
-                      <span className="item-price">
-                        ${(item.price * item.quantity).toLocaleString()}
-                      </span>
+                      <div className="item-price">
+                        <span className="item-price-main">
+                          ${(getFeaturedPrice(item, settings.featuredPriceMode) * item.quantity).toLocaleString()}
+                          <span className="item-price-label">
+                            {settings.featuredPriceMode === 'cash' ? 'Efectivo / Transferencia' : '3 cuotas sin interés'}
+                          </span>
+                        </span>
+                        <span className="item-price-secondary">
+                          ${(getSecondaryPrice(item, settings.featuredPriceMode) * item.quantity).toLocaleString()}
+                          <span className="item-price-label">
+                            {settings.featuredPriceMode === 'cash' ? '3 cuotas sin interés' : 'Efectivo / Transferencia'}
+                          </span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -324,11 +337,19 @@ export default function CartDrawer({ isOpen, onClose }) {
 
         {cart.length > 0 && (
           <div className="cart-footer">
-            <div className="total-row">
-              <span>Total</span>
-              <span className="total-amount">
-                ${cartTotal.toLocaleString()}
-              </span>
+            <div className="cart-totals">
+              <div className="total-row">
+                <span>Total — 3 cuotas sin interés</span>
+                <span className="total-amount">
+                  ${getTotalForMethod('mercadopago').toLocaleString()}
+                </span>
+              </div>
+              <div className="total-row total-row-secondary">
+                <span>Total — Efectivo / Transferencia</span>
+                <span className="total-amount-secondary">
+                  ${getTotalForMethod('whatsapp').toLocaleString()}
+                </span>
+              </div>
             </div>
             <button
               className="btn btn-primary checkout-btn"

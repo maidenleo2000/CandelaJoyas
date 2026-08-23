@@ -55,6 +55,8 @@ export default function SettingsProvider({ children }) {
     // Checkout Settings
     checkoutRequireName: true,
     checkoutRequirePhone: true,
+    // Pricing Settings: qué precio se destaca en la tienda ('installments' o 'cash')
+    featuredPriceMode: 'installments',
     // Marquee Settings
     showMarquee: true,
     marqueeText: 'COMPRA MÍNIMA: 10 PRODUCTOS SURTIDOS — PRECIOS MAYORISTAS — ENVÍOS A TODO EL PAÍS',

@@ -1,9 +1,12 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 import toast from 'react-hot-toast';
+import { SettingsContext } from './SettingsContext';
+import { getFeaturedPrice, getPriceForPaymentMethod } from '../utils/pricing';
 
 export const CartContext = createContext();
 
 export default function CartProvider({ children }) {
+  const { settings } = useContext(SettingsContext);
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : [];
@@ -94,17 +97,23 @@ export default function CartProvider({ children }) {
   };
 
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-  const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const cartTotal = cart.reduce((total, item) => total + (getFeaturedPrice(item, settings.featuredPriceMode) * item.quantity), 0);
+
+  const getTotalForMethod = (paymentMethod) => cart.reduce(
+    (total, item) => total + (getPriceForPaymentMethod(item, paymentMethod) * item.quantity),
+    0
+  );
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
-      addToCart, 
-      removeFromCart, 
+    <CartContext.Provider value={{
+      cart,
+      addToCart,
+      removeFromCart,
       removeItemCompletely,
-      clearCart, 
-      cartCount, 
-      cartTotal 
+      clearCart,
+      cartCount,
+      cartTotal,
+      getTotalForMethod
     }}>
       {children}
     </CartContext.Provider>

@@ -142,10 +142,9 @@
 
 .product-price-container {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 0.15rem;
   margin-bottom: 1.5rem;
-  flex-wrap: wrap;
 }
 
 .sale-price {
@@ -157,6 +156,25 @@
   color: var(--text-muted);
   text-decoration: line-through;
   font-weight: 400;
+}
+
+.product-price-secondary {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.price-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.product-price .price-label {
+  color: var(--color-primary);
 }
 
 .offer-badge {

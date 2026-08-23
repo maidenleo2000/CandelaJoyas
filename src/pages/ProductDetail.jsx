@@ -7,6 +7,7 @@ import { CartContext } from '../contexts/CartContext';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { toast } from 'react-hot-toast';
 import { getStockKey, hasVariantSelected } from '../utils/stock';
+import { getInstallmentPrice, getCashPrice } from '../utils/pricing';
 import './ProductDetail.css';
 
 export default function ProductDetail() {
@@ -344,14 +345,34 @@ export default function ProductDetail() {
           <div className="breadcrumbs">{product.category}</div>
           <h1>{product.name}</h1>
           <div className="product-price-section">
-            {product.isOnSale ? (
+            {product.isOnSale && (
               <div className="price-wrapper">
-                <span className="current-price sale">{formatPrice(product.newPrice)}</span>
                 <span className="old-price">{formatPrice(product.oldPrice)}</span>
                 <span className="discount-tag">{product.discountPercentage}% OFF</span>
               </div>
+            )}
+            {settings.featuredPriceMode === 'cash' ? (
+              <>
+                <p className="price">
+                  {formatPrice(getCashPrice(product))}
+                  <span className="price-label">Efectivo / Transferencia</span>
+                </p>
+                <p className="price-secondary">
+                  {formatPrice(getInstallmentPrice(product))}
+                  <span className="price-label">3 cuotas sin interés</span>
+                </p>
+              </>
             ) : (
-              <p className="price">{formatPrice(product.price)}</p>
+              <>
+                <p className="price">
+                  {formatPrice(getInstallmentPrice(product))}
+                  <span className="price-label">3 cuotas sin interés</span>
+                </p>
+                <p className="price-secondary">
+                  {formatPrice(getCashPrice(product))}
+                  <span className="price-label">Efectivo / Transferencia</span>
+                </p>
+              </>
             )}
           </div>
 

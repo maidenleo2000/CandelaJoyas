@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CartContext } from '../../contexts/CartContext';
+import { SettingsContext } from '../../contexts/SettingsContext';
+import { getInstallmentPrice, getCashPrice } from '../../utils/pricing';
 import './ProductCard.css';
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
+  const { settings } = useContext(SettingsContext);
   const images = product.images && product.images.length > 0 ? product.images : (product.imageUrl ? [{url: product.imageUrl}] : []);
   
   // Encontrar el índice de la imagen principal para mostrarla primero
@@ -119,13 +122,31 @@ export default function ProductCard({ product }) {
           <Link to={`/product/${product.id}`}>{product.name}</Link>
         </h3>
         <div className="product-price-container">
-          {product.isOnSale ? (
+          {product.isOnSale && (
+            <p className="product-old-price">{formatPrice(product.oldPrice)}</p>
+          )}
+          {settings.featuredPriceMode === 'cash' ? (
             <>
-              <p className="product-price sale-price">{formatPrice(product.newPrice)}</p>
-              <p className="product-old-price">{formatPrice(product.oldPrice)}</p>
+              <p className="product-price">
+                {formatPrice(getCashPrice(product))}
+                <span className="price-label">Efectivo / Transferencia</span>
+              </p>
+              <p className="product-price-secondary">
+                {formatPrice(getInstallmentPrice(product))}
+                <span className="price-label">3 cuotas sin interés</span>
+              </p>
             </>
           ) : (
-            <p className="product-price">{formatPrice(product.price)}</p>
+            <>
+              <p className="product-price">
+                {formatPrice(getInstallmentPrice(product))}
+                <span className="price-label">3 cuotas sin interés</span>
+              </p>
+              <p className="product-price-secondary">
+                {formatPrice(getCashPrice(product))}
+                <span className="price-label">Efectivo / Transferencia</span>
+              </p>
+            </>
           )}
         </div>
         

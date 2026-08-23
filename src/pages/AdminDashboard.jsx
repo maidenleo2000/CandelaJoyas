@@ -10,6 +10,7 @@ import { useMaintenanceStatus } from '../hooks/useMaintenanceStatus';
 import { registerPush, unregisterPush } from '../services/pushNotifications';
 import { useProducts, fromRow as productFromRow } from '../hooks/useProducts';
 import { pluralizeEs } from '../utils/labels';
+import { getInstallmentPrice, getCashPrice } from '../utils/pricing';
 import { useCategories } from '../hooks/useCategories';
 import SalesTab from './SalesTab';
 import EnviosTab from './EnviosTab';
@@ -1335,7 +1336,7 @@ export default function AdminDashboard() {
                         <input type="number" name="oldPrice" value={formData.oldPrice} onChange={handleInputChange} required={formData.isOnSale} />
                       </div>
                       <div className="form-group">
-                        <label>Precio Oferta (ARS)</label>
+                        <label>Precio de Lista en Oferta / Efectivo (ARS)</label>
                         <input type="number" name="newPrice" value={formData.newPrice} onChange={handleInputChange} required={formData.isOnSale} />
                       </div>
                       <div className="form-group" style={{ display: 'flex', flexFlow: 'column', justifyContent: 'center' }}>
@@ -1344,12 +1345,26 @@ export default function AdminDashboard() {
                           {formData.discountPercentage}% OFF
                         </div>
                       </div>
+                      {formData.newPrice > 0 && (
+                        <div className="form-group" style={{ flexBasis: '100%' }}>
+                          <p style={{ fontSize: '0.8rem', color: '#666', margin: 0 }}>
+                            Vista previa en la tienda: <strong>3 cuotas sin interés ${getInstallmentPrice(formData).toLocaleString()}</strong>{' '}
+                            — Efectivo/Transferencia ${getCashPrice(formData).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="form-row">
                       <div className="form-group">
-                        <label>Precio (ARS) *</label>
+                        <label>Precio de Lista / Efectivo (ARS) *</label>
                         <input type="number" min="0" step="any" name="price" value={formData.price} onChange={handleInputChange} required={!formData.isOnSale} />
+                        {formData.price > 0 && (
+                          <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '5px' }}>
+                            Vista previa en la tienda: <strong>3 cuotas sin interés ${getInstallmentPrice(formData).toLocaleString()}</strong>{' '}
+                            — Efectivo/Transferencia ${getCashPrice(formData).toLocaleString()}
+                          </p>
+                        )}
                       </div>
                       <div className="form-group">
                          {/* Empty space for alignment */}
@@ -1856,6 +1871,9 @@ export default function AdminDashboard() {
                           ) : (
                             `$${product.price}`
                           )}</span>
+                          <span style={{ display: 'block', fontSize: '0.75rem', color: '#666' }}>
+                            Cuotas: ${getInstallmentPrice(product).toLocaleString()} · Efectivo/Transf.: ${getCashPrice(product).toLocaleString()}
+                          </span>
                           
                           {settings.enableStockManagement && product.stock && (
                             <div className="stock-summary-compact" style={{ marginTop: '8px', display: 'flex', gap: '6px', flexWrap: 'wrap', maxHeight: '100px', overflowY: 'auto', padding: '4px', background: 'rgba(0,0,0,0.02)', borderRadius: '6px' }}>
@@ -2798,7 +2816,7 @@ export default function AdminDashboard() {
                     {siteSettings.enableMercadoEnvios && (
                       <div className="form-group" style={{ marginLeft: '34px', marginTop: '1rem', maxWidth: '200px' }}>
                         <label>Costo de Envío Fijo ($)</label>
-                        <input 
+                        <input
                           type="number"
                           name="shippingCost"
                           value={siteSettings.shippingCost || 0}
@@ -2811,6 +2829,35 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                     )}
+
+                    <div className="form-group" style={{ marginTop: '1.5rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
+                      <label style={{ fontWeight: 'bold' }}>Precio a destacar en la tienda</label>
+                      <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '0.5rem' }}>
+                        Cada producto muestra 2 precios: "3 cuotas sin interés" (Mercado Pago) y "Efectivo / Transferencia" (WhatsApp). Elegí cuál se muestra más grande en las tarjetas y el detalle de producto.
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <label className="checkbox-label" style={{ fontWeight: 'normal' }}>
+                          <input
+                            type="radio"
+                            name="featuredPriceMode"
+                            value="installments"
+                            checked={(siteSettings.featuredPriceMode || 'installments') === 'installments'}
+                            onChange={handleSettingsChange}
+                          />
+                          3 cuotas sin interés (Mercado Pago)
+                        </label>
+                        <label className="checkbox-label" style={{ fontWeight: 'normal' }}>
+                          <input
+                            type="radio"
+                            name="featuredPriceMode"
+                            value="cash"
+                            checked={siteSettings.featuredPriceMode === 'cash'}
+                            onChange={handleSettingsChange}
+                          />
+                          Efectivo / Transferencia
+                        </label>
+                      </div>
+                    </div>
                   </div>
 
                   <h3 style={{ marginTop: '2.5rem' }}><Package size={18} /> Inventario y Stock</h3>
