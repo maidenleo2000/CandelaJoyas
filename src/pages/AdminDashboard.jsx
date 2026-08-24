@@ -179,6 +179,7 @@ export default function AdminDashboard() {
     marqueeTextColor: '#ffffff',
     marqueeFontSize: '0.85',
     marqueeHeight: '36',
+    marqueeSpeed: '30',
     showColorFilter: true,
     showSizeFilter: true,
     colorLabel: 'Color',
@@ -2568,19 +2569,42 @@ export default function AdminDashboard() {
                     </p>
                   </div>
 
-                  <button 
-                    type="button" 
-                    className="btn-marquee-reset" 
+                  <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                    <label>Velocidad de la marquesina (segundos): <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{siteSettings.marqueeSpeed || '30'}s</span></label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                      <input
+                        type="range"
+                        name="marqueeSpeed"
+                        min="10"
+                        max="60"
+                        step="1"
+                        value={siteSettings.marqueeSpeed || '30'}
+                        onChange={handleSettingsChange}
+                        style={{ flex: 1 }}
+                      />
+                      <div style={{ padding: '4px 10px', background: '#f0f0f0', borderRadius: '4px', fontSize: '0.8rem', minWidth: '80px', textAlign: 'center' }}>
+                         {siteSettings.marqueeSpeed || '30'}s
+                      </div>
+                    </div>
+                    <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: '5px' }}>
+                      Un valor menor hace que el texto se mueva más rápido; un valor mayor lo hace más lento.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn-marquee-reset"
                     onClick={() => {
                       setSiteSettings(prev => ({
                         ...prev,
                         marqueeFontSize: '0.85',
-                        marqueeHeight: '36'
+                        marqueeHeight: '36',
+                        marqueeSpeed: '30'
                       }));
                       toast.success('Valores de marquesina restablecidos');
                     }}
                   >
-                    <RotateCcw size={14} /> Restablecer Tamaño y Alto por defecto
+                    <RotateCcw size={14} /> Restablecer Tamaño, Alto y Velocidad por defecto
                   </button>
                 </div>
               </div>

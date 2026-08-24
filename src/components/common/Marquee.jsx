@@ -16,7 +16,10 @@ export default function Marquee() {
         fontSize: `${settings.marqueeFontSize || 0.85}rem`
       }}
     >
-      <div className="marquee-content">
+      <div
+        className="marquee-content"
+        style={{ animationDuration: `${settings.marqueeSpeed || 30}s` }}
+      >
         <span className="marquee-text">{settings.marqueeText}</span>
         <span className="marquee-text">{settings.marqueeText}</span>
         <span className="marquee-text">{settings.marqueeText}</span>

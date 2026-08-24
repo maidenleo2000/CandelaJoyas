@@ -64,6 +64,7 @@ export default function SettingsProvider({ children }) {
     marqueeTextColor: '#ffffff',
     marqueeFontSize: '0.85', // rem
     marqueeHeight: '36', // px
+    marqueeSpeed: '30', // segundos
     // FAQ Settings
     faqColumns: 2,
     howToBuyWidth: 780,
