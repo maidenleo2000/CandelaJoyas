@@ -146,6 +146,7 @@ export default function CartDrawer({ isOpen, onClose }) {
           `*EMPRESA: ${settings.siteTitle}*\n\n` +
           `${orderList}\n\n` +
           `*TOTAL (Efectivo/Transferencia): $${orderTotal.toLocaleString()}*\n\n` +
+          (settings.bankAlias ? `*Alias para transferencia: ${settings.bankAlias}*\n\n` : '') +
           `Por favor, confirmar disponibilidad para continuar con el pago.`;
 
         const whatsappUrl = `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(message)}`;

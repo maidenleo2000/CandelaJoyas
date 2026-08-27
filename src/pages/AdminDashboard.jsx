@@ -2805,6 +2805,20 @@ export default function AdminDashboard() {
                       <p style={{ fontSize: '0.8rem', marginLeft: '34px', color: '#666' }}>
                         El cliente envía su carrito por mensaje directo para coordinar pago y entrega.
                       </p>
+                      {siteSettings.enableWhatsApp !== false && (
+                        <div className="form-group" style={{ marginLeft: '34px', marginTop: '1rem', maxWidth: '280px' }}>
+                          <label>Alias para Transferencia/Efectivo</label>
+                          <input
+                            type="text"
+                            name="bankAlias"
+                            value={siteSettings.bankAlias || ''}
+                            onChange={handleSettingsChange}
+                            placeholder="Ej. tienda.cande.mp"
+                            style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                          />
+                          <small className="form-hint">Se le muestra al cliente (con botón de copiar) cuando elige pagar en efectivo/transferencia.</small>
+                        </div>
+                      )}
                     </div>
 
                     <div className="form-group checkbox-group">

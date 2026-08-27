@@ -17,6 +17,7 @@ export default function SettingsProvider({ children }) {
     heroSubtitleSize: '1', // rem
     showBackToTop: true,
     whatsappNumber: '',
+    bankAlias: '',
     logoShape: 'normal',
     faviconUrl: '',
     // Footer Settings

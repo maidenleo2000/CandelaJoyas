@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { SettingsContext } from '../../contexts/SettingsContext';
 import { AuthContext } from '../../contexts/AuthContext';
-import { MessageCircle, CreditCard, Clock, Loader2, UserPlus } from 'lucide-react';
+import { MessageCircle, CreditCard, Clock, Loader2, UserPlus, Copy, Check } from 'lucide-react';
 import { quoteCorreoEnvio } from '../../services/shipping';
 import { toast } from 'react-hot-toast';
 import '../common/ConfirmModal.css'; // Reuse basic modal overlay styles
@@ -24,6 +24,7 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
   const [emailError, setEmailError] = useState('');
   const [selectedMethod, setSelectedMethod] = useState(null); // 'whatsapp' or 'mercadopago'
   const [shippingMethod, setShippingMethod] = useState('coordinate'); // 'coordinate', 'mercadoenvios' or 'correoargentino'
+  const [aliasCopied, setAliasCopied] = useState(false);
 
   // Crear cuenta al comprar como invitado (para poder hacer seguimiento del pedido después)
   const [wantAccount, setWantAccount] = useState(false);
@@ -100,6 +101,17 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
 
   const requireName = settings?.checkoutRequireName !== false;
   const requirePhone = settings?.checkoutRequirePhone !== false;
+
+  const handleCopyAlias = async () => {
+    try {
+      await navigator.clipboard.writeText(settings.bankAlias);
+      setAliasCopied(true);
+      toast.success('Alias copiado');
+      setTimeout(() => setAliasCopied(false), 2000);
+    } catch {
+      toast.error('No se pudo copiar el alias');
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -184,7 +196,7 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
         </div>
         <form onSubmit={handleSubmit} className="modal-body">
           <p style={{ marginBottom: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Por favor, ingresa tus datos para procesar el pedido por WhatsApp.
+            Por favor, ingresa tus datos para procesar el pedido.
           </p>
           
           <div className="form-group" style={{ marginBottom: '1rem' }}>
@@ -309,12 +321,12 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
 
           <div className="payment-method-selector" style={{ marginBottom: '2rem' }}>
             <label style={{ display: 'block', marginBottom: '1rem', fontWeight: '600', color: 'var(--color-dark)' }}>
-              Seleccioná el método de pago:
+              ¿Cómo vas a abonar?
             </label>
-            
+
             <div className="payment-options" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
               {enableWhatsApp && (
-                <div 
+                <div
                   className={`payment-option ${selectedMethod === 'whatsapp' ? 'active' : ''}`}
                   onClick={() => setSelectedMethod('whatsapp')}
                   style={{
@@ -333,8 +345,8 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
                     <MessageCircle size={20} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600' }}>WhatsApp</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Acordar pago y envío por chat</div>
+                    <div style={{ fontWeight: '600' }}>Efectivo / Transferencia</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Coordinamos el pago por WhatsApp</div>
                   </div>
                   <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {selectedMethod === 'whatsapp' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-primary)' }}></div>}
@@ -342,8 +354,38 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
                 </div>
               )}
 
+              {selectedMethod === 'whatsapp' && settings?.bankAlias && (
+                <div
+                  className="animate-fade-in"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.8rem',
+                    padding: '0.9rem 1rem',
+                    borderRadius: '10px',
+                    background: 'rgba(212, 163, 115, 0.08)',
+                    border: '1px dashed var(--color-primary)'
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Alias para transferencia</div>
+                    <div style={{ fontWeight: '700', fontFamily: 'monospace', fontSize: '1rem' }}>{settings.bankAlias}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCopyAlias}
+                    className="btn btn-outline"
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.5rem 0.8rem', whiteSpace: 'nowrap' }}
+                  >
+                    {aliasCopied ? <Check size={16} /> : <Copy size={16} />}
+                    {aliasCopied ? 'Copiado' : 'Copiar'}
+                  </button>
+                </div>
+              )}
+
               {enableMercadoPago && (
-                <div 
+                <div
                   className={`payment-option ${selectedMethod === 'mercadopago' ? 'active' : ''}`}
                   onClick={() => setSelectedMethod('mercadopago')}
                   style={{
@@ -362,8 +404,8 @@ export default function CheckoutModal({ isOpen, onCancel, onConfirm, isSubmittin
                     <CreditCard size={20} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '600' }}>Mercado Pago</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Pagar de forma segura (Tarjetas/Dinero en cuenta)</div>
+                    <div style={{ fontWeight: '600' }}>En cuotas</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Pago con tarjeta vía Mercado Pago</div>
                   </div>
                   <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid #009EE3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {selectedMethod === 'mercadopago' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#009EE3' }}></div>}
