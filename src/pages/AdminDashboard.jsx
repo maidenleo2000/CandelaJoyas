@@ -21,7 +21,10 @@ import CategoryManager from '../components/admin/CategoryManager';
 import MarketingTool from '../components/admin/MarketingTool';
 import SocialPublisher from '../components/admin/SocialPublisher';
 import MercadoPagoConfig from '../components/admin/MercadoPagoConfig';
+import AdminNavigation from '../components/admin/AdminNavigation';
+import { getAdminSection } from '../components/admin/adminSections';
 import './AdminDashboard.css';
+import './AdminWorkspace.css';
 
 // Helper para procesar imágenes en el cliente antes de subir
 const processImage = (file, maxWidth, quality = 0.85) => {
@@ -84,7 +87,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get('tab');
-    if (tab && ['products', 'sales', 'settings', 'myaccount', 'users', 'faqs', 'categories', 'marketing', 'metrics'].includes(tab)) {
+    if (tab && ['products', 'sales', 'settings', 'myaccount', 'users', 'faqs', 'categories', 'marketing', 'metrics', 'envios', 'social'].includes(tab)) {
       setActiveTab(tab);
     }
   }, [location]);
@@ -1000,100 +1003,25 @@ export default function AdminDashboard() {
 
   return (
     <div className="container admin-dashboard animate-fade-in">
-      <div className="admin-header">
-        <h1>Panel de Administración</h1>
-        <p>Gestiona los productos y la apariencia de tu tienda.</p>
-      </div>
-
-      <div className="admin-tabs">
-        {userRole === 'admin' && (
-          <>
-            <button 
-              className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`}
-              onClick={() => setActiveTab('products')}
-            >
-              <Package size={20} /> Productos
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'sales' ? 'active' : ''}`}
-              onClick={() => setActiveTab('sales')}
-            >
-              <ShoppingBag size={20} /> Ventas
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'metrics' ? 'active' : ''}`}
-              onClick={() => setActiveTab('metrics')}
-            >
-              <BarChart3 size={20} /> Métricas
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'envios' ? 'active' : ''}`}
-              onClick={() => setActiveTab('envios')}
-            >
-              <Truck size={20} /> Envíos
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
-              onClick={() => setActiveTab('settings')}
-            >
-              <Settings size={20} /> Configuración
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'faqs' ? 'active' : ''}`}
-              onClick={() => setActiveTab('faqs')}
-            >
-              <MessageSquare size={20} /> FAQs
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'categories' ? 'active' : ''}`}
-              onClick={() => setActiveTab('categories')}
-            >
-              <Tag size={20} /> Categorías
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'marketing' ? 'active' : ''}`}
-              onClick={() => setActiveTab('marketing')}
-            >
-              <Share2 size={20} /> Marketing
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'social' ? 'active' : ''}`}
-              onClick={() => setActiveTab('social')}
-            >
-              <Share2 size={20} /> Redes Sociales
-            </button>
-          </>
-        )}
-        <button 
-          className={`tab-btn ${activeTab === 'myaccount' ? 'active' : ''}`}
-          onClick={() => setActiveTab('myaccount')}
-        >
-          <User size={20} /> Mi Cuenta
-        </button>
-        {userRole === 'admin' && (
-          <button 
-            className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
-            onClick={() => setActiveTab('users')}
-          >
-            <Users size={20} /> Usuarios
-          </button>
-        )}
-        <button 
-          className="tab-btn"
-          onClick={() => navigate('/admin/guia')}
-          style={{ color: 'var(--primary-color)' }}
-        >
-          <BookOpen size={20} /> Guía
-        </button>
-        <button 
-          className="tab-btn logout-btn"
-          onClick={logout}
-          style={{ marginLeft: 'auto', color: '#dc2626' }}
-        >
-          <LogOut size={20} /> Salir
-        </button>
-      </div>
-      
+      <AdminNavigation
+        activeTab={userRole === 'admin' ? activeTab : 'myaccount'}
+        isAdmin={userRole === 'admin'}
+        onSelect={(tab) => {
+          const params = new URLSearchParams(location.search);
+          params.set('tab', tab);
+          navigate({ pathname: location.pathname, search: params.toString() });
+        }}
+        onGuide={() => navigate('/admin/guia')}
+        onStore={() => navigate('/')}
+        onLogout={logout}
+      />
+      <main className="admin-workspace" id="admin-workspace">
+        <header className="admin-page-heading">
+          <div><p className="admin-eyebrow">Panel de administración</p>
+            <h1>{getAdminSection(userRole === 'admin' ? activeTab : 'myaccount').label}</h1>
+            <p>{getAdminSection(userRole === 'admin' ? activeTab : 'myaccount').description}</p>
+          </div>
+        </header>
       {activeTab === 'sales' && userRole === 'admin' && (
         <SalesTab />
       )}
@@ -1128,7 +1056,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {activeTab === 'myaccount' && (
+      {(activeTab === 'myaccount' || userRole !== 'admin') && (
         <div className="admin-form-panel glass animate-fade-in" style={{ maxWidth: '600px', margin: '2rem auto' }}>
           <h3><User size={20} /> Mi Cuenta</h3>
           <p style={{ marginBottom: '2rem', color: 'var(--text-muted)' }}>Gestiona tu información de acceso y seguridad.</p>
@@ -1244,7 +1172,7 @@ export default function AdminDashboard() {
                 if (isEditing) resetForm();
               }}
             >
-              <Package size={18} /> Ver Productos
+              <Package size={18} /> Catálogo
             </button>
             <button 
               className={`p-tab-btn ${productView === 'edit' ? 'active' : ''}`}
@@ -2067,17 +1995,17 @@ export default function AdminDashboard() {
 
       {activeTab === 'settings' && userRole === 'admin' && (
         <div className="admin-settings-panel glass animate-fade-in">
-          <h2><Palette size={24} /> Personalización de la Tienda</h2>
-          <p>Cambia los colores, el título y el logo de tu sitio en tiempo real.</p>
+          <h2><Palette size={24} /> Opciones de la tienda</h2>
+          <p>Elegí una sección para editar la apariencia, el contenido o las opciones de compra.</p>
           
           <div className="settings-tabs">
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'identity' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('identity')}><Type size={16} /> Marca</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'hero' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('hero')}><Layout size={16} /> Inicio</button>
-            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'marquee' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('marquee')}><Megaphone size={16} /> Marquesina</button>
+            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'marquee' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('marquee')}><Megaphone size={16} /> Anuncio superior</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'videos' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('videos')}><Video size={16} /> Videos</button>
-            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'sidebar' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('sidebar')}><GalleryHorizontal size={16} /> Sidebar</button>
-            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'checkout' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('checkout')}><ClipboardCheck size={16} /> Checkout</button>
-            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'footer' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('footer')}><Link size={16} /> Footer</button>
+            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'sidebar' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('sidebar')}><GalleryHorizontal size={16} /> Carrusel lateral</button>
+            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'checkout' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('checkout')}><ClipboardCheck size={16} /> Compra y pagos</button>
+            <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'footer' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('footer')}><Link size={16} /> Pie de página</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'about' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('about')}><User size={16} /> Nosotras</button>
             <button type="button" className={`settings-tab-btn ${activeSettingsTab === 'maintenance' ? 'active' : ''}`} onClick={() => setActiveSettingsTab('maintenance')}><Wrench size={16} /> Mantenimiento</button>
           </div>
@@ -3277,6 +3205,7 @@ export default function AdminDashboard() {
           </form>
         </div>
       )}
+      </main>
     </div>
   );
 }

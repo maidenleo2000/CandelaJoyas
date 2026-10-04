@@ -76,6 +76,10 @@ Deno.serve(async (req) => {
                 : ""
             }
             <p style="font-size: 16px; color: #333; text-align: right;"><strong>Total: $${Number(total).toLocaleString()}</strong></p>
+            <p style="font-size: 14px; color: #666; text-align: center;">Podés seguir el estado de tu pedido en cualquier momento desde tu cuenta.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="https://candelajoyas.com.ar/mi-cuenta" style="background-color: #d4a373; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; display: inline-block;">Ver estado de mi pedido</a>
+            </div>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
             <p style="font-size: 14px; color: #666;">Te avisaremos por email apenas se confirme el pago. Ante cualquier consulta, mencioná tu número de pedido.</p>
             <p style="font-size: 12px; color: #999; text-align: center;">Este es un mensaje automático de Candela Joyas. Por favor no respondas a este correo.</p>
