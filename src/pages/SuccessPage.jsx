@@ -93,11 +93,11 @@ const SuccessPage = () => {
         </div>
 
         <div className="success-actions">
-          <Link to="/" className="btn-primary">
+          <Link replace to="/" className="btn-primary">
             <ShoppingBag size={20} />
             Seguir Comprando
           </Link>
-          <Link to="/como-comprar" className="btn-secondary">
+          <Link replace to="/como-comprar" className="btn-secondary">
             Ver guía de envíos
             <ArrowRight size={18} />
           </Link>

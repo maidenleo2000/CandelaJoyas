@@ -150,7 +150,7 @@ export default function ProductDetail() {
   };
 
   if (loading) return <div className="loading-state flex-center"><div className="loader"></div></div>;
-  if (!product) return <div className="container empty-state"><h3>Producto no encontrado</h3><Link to="/" className="btn btn-outline">Volver a inicio</Link></div>;
+  if (!product) return <div className="container empty-state"><h3>Producto no encontrado</h3><Link replace to="/" className="btn btn-outline">Volver a inicio</Link></div>;
 
   const videoId = getYoutubeId(product.videoUrl);
   
@@ -241,7 +241,7 @@ export default function ProductDetail() {
 
   return (
     <div className="container product-detail-page animate-fade-in">
-      <Link to="/" className="back-link">
+      <Link replace to="/" className="back-link">
         <ArrowLeft size={20} />
         Volver al catálogo
       </Link>

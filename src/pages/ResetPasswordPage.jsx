@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate as useNavigate } from '../hooks/useAppNavigate';
 import { supabase } from '../services/supabase';
 import toast from 'react-hot-toast';
 import { KeyRound } from 'lucide-react';

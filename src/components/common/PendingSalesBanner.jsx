@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useAppNavigate as useNavigate } from '../../hooks/useAppNavigate';
 import { supabase } from '../../services/supabase';
 import { AuthContext } from '../../contexts/AuthContext';
 import { ShoppingBag, ArrowRight, X } from 'lucide-react';

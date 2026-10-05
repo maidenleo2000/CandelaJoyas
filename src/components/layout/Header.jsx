@@ -1,5 +1,6 @@
 import { useContext, useState, useMemo } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useAppNavigate as useNavigate } from '../../hooks/useAppNavigate';
 import { ShoppingCart, Menu, User, LogOut, X, ArrowLeft, Search, ChevronDown } from 'lucide-react';
 import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
@@ -10,6 +11,7 @@ import { useCategories } from '../../hooks/useCategories';
 import CartDrawer from './CartDrawer';
 import Marquee from '../common/Marquee';
 import PendingSalesBanner from '../common/PendingSalesBanner';
+import ApplicationMenu from '../common/ApplicationMenu';
 import './Header.css';
 
 export default function Header() {
@@ -61,7 +63,7 @@ export default function Header() {
   const [logoLoaded, setLogoLoaded] = useState(false);
 
   const logoElement = (
-    <Link 
+    <Link replace
       to="/" 
       className={`logo ${settings.logoUrl && !logoLoaded ? 'logo-loading' : 'logo-ready'}`} 
       onClick={closeMenu}
@@ -117,11 +119,11 @@ export default function Header() {
             </div>
 
             {settings.showAbout && (
-              <Link to="/nosotras" className="mobile-nav-link" onClick={closeMenu}>Sobre Nosotros</Link>
+              <Link replace to="/nosotras" className="mobile-nav-link" onClick={closeMenu}>Sobre Nosotros</Link>
             )}
-            <Link to="/como-comprar" className="mobile-nav-link" onClick={closeMenu}>¿Cómo comprar?</Link>
+            <Link replace to="/como-comprar" className="mobile-nav-link" onClick={closeMenu}>¿Cómo comprar?</Link>
             {currentUser && (
-              <Link to={accountPath} className="mobile-nav-link admin-mobile-link" onClick={closeMenu}>
+              <Link replace to={accountPath} className="mobile-nav-link admin-mobile-link" onClick={closeMenu}>
                 {userRole === 'admin' ? 'Panel Admin' : 'Mis Pedidos'}
               </Link>
             )}
@@ -133,7 +135,7 @@ export default function Header() {
                 <LogOut size={18} /> Cerrar Sesión
               </button>
             ) : (
-              <Link to="/mi-cuenta" className="btn btn-primary w-full flex-center gap-2" onClick={closeMenu}>
+              <Link replace to="/mi-cuenta" className="btn btn-primary w-full flex-center gap-2" onClick={closeMenu}>
                 <User size={18} /> Mi Cuenta
               </Link>
             )}
@@ -189,9 +191,9 @@ export default function Header() {
             </div>
 
             {settings.showAbout && (
-              <Link to="/nosotras" className="nav-link">Sobre Nosotros</Link>
+              <Link replace to="/nosotras" className="nav-link">Sobre Nosotros</Link>
             )}
-            <Link to="/como-comprar" className="nav-link">Cómo Comprar</Link>
+            <Link replace to="/como-comprar" className="nav-link">Cómo Comprar</Link>
           </nav>
 
           <div className="header-search">
@@ -239,7 +241,8 @@ export default function Header() {
           </div>
 
           <div className="header-actions">
-            <Link to={accountPath} className="action-btn" aria-label="Mi Cuenta">
+            <ApplicationMenu />
+            <Link replace to={accountPath} className="action-btn" aria-label="Mi Cuenta">
               <User size={20} />
             </Link>
 

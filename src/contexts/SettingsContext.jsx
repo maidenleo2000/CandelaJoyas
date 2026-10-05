@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabase';
 import toast from 'react-hot-toast';
+import { syncPwaBrand } from '../services/pwaBranding';
 
 export const SettingsContext = createContext();
 
@@ -100,6 +101,7 @@ export default function SettingsProvider({ children }) {
   settingsRef.current = settings;
 
   const applySettings = (data) => {
+    syncPwaBrand(data);
     document.title = data.siteTitle || 'Mi Tienda';
     const root = document.documentElement;
     if (data.primaryColor) {

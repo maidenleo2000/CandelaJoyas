@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useAppNavigate as useNavigate } from '../hooks/useAppNavigate';
 import { AuthContext } from '../contexts/AuthContext';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { supabase } from '../services/supabase';

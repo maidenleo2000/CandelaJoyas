@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useAppNavigate as useNavigate } from '../../hooks/useAppNavigate';
 import { ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CartContext } from '../../contexts/CartContext';
 import { SettingsContext } from '../../contexts/SettingsContext';
@@ -63,7 +64,7 @@ export default function ProductCard({ product }) {
 
   return (
     <div className="product-card animate-slide-up">
-      <Link 
+      <Link replace
         to={`/product/${product.id}`} 
         className="product-image-container"
         onTouchStart={handleTouchStart}
@@ -119,7 +120,7 @@ export default function ProductCard({ product }) {
       <div className={`product-info ${product.isPaused ? 'product-paused' : ''}`}>
         <span className="product-category">{product.category}</span>
         <h3 className="product-name">
-          <Link to={`/product/${product.id}`}>{product.name}</Link>
+          <Link replace to={`/product/${product.id}`}>{product.name}</Link>
         </h3>
         <div className="product-price-container">
           {product.isOnSale && (

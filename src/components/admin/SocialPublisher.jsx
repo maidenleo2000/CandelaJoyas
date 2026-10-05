@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
+import { useAppNavigate as useNavigate } from '../../hooks/useAppNavigate';
 import {
   Search,
   Check,

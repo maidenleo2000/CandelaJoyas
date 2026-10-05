@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate as useNavigate } from '../hooks/useAppNavigate';
 import { AuthContext } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import { saleFromRow, ORDER_STATUS_STEPS } from '../utils/salesMapper';

@@ -1,0 +1,32 @@
+.action-btn.application-menu-trigger { gap: 6px; width: auto; padding: 0 10px; border-radius: 10px; }
+.application-menu-trigger span { font-size: .76rem; }
+.application-menu-dialog { margin: auto; padding: 0; width: min(460px, calc(100vw - 28px)); max-height: calc(100dvh - 40px); border: 1px solid #e9e5df; border-radius: 20px; color: var(--color-dark); background: #fff; box-shadow: 0 20px 80px #0003; overflow-y: auto; }
+.application-menu-dialog::backdrop { background: #20203380; }
+.application-menu-content { padding: 24px; }
+.application-menu-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
+.application-menu-heading p { color: #947043; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+.application-menu-heading h2 { font-size: 1.65rem; }
+.application-menu-close { display: grid; place-items: center; width: 44px; height: 44px; background: #f6f4f0; border: 0; border-radius: 50%; color: var(--color-dark); cursor: pointer; }
+.application-menu-links { display: grid; gap: 6px; margin-bottom: 20px; }
+.application-menu-links a { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; font-size: .9rem; }
+.application-menu-links a:hover { background: #f6f4f0; }
+.application-install-card { padding: 22px; background: #faf6ef; border-radius: 14px; border: 1px solid #eee2d1; }
+.application-install-icon { display: inline-flex; color: #a97744; margin-bottom: 12px; }
+.application-install-card h3 { font-size: 1.3rem; margin-bottom: 10px; }
+.application-install-card p { color: #69636c; font-size: .87rem; line-height: 1.6; }
+.application-install-card .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 18px; }
+.application-install-help { border-top: 1px solid #e9ddcc; margin-top: 18px; padding-top: 16px; }
+.application-install-help h4 { font-family: var(--font-body); font-size: .86rem; margin-bottom: 12px; }
+.application-install-help ol { padding-left: 20px; color: #69636c; font-size: .84rem; }
+.application-install-help li { margin: 8px 0; padding-left: 4px; }
+.application-install-message { margin-top: 14px; }
+.application-menu-dialog :focus-visible { outline: 3px solid #b9844e; outline-offset: 3px; }
+@media (max-width: 768px) {
+  .application-menu-trigger span { display: none; }
+  .application-menu-content { padding: 20px; }
+  .header .header-actions { gap: 4px; }
+  .header .logo-container { flex: 1; min-width: 0; }
+  .header .logo { min-width: 0; gap: 6px; }
+  .header .action-btn { width: 34px; padding: 0; flex-shrink: 0; }
+  .header .logo-img { width: 32px; height: 32px; }
+}

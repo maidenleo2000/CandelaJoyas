@@ -40,7 +40,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer-content">
         <div className="footer-section brand">
-          <Link to="/" className="logo footer-logo">
+          <Link replace to="/" className="logo footer-logo">
             {settings.logoUrl && (
               <img src={settings.logoUrl} alt={settings.siteTitle || 'Candela'} className="logo-img" style={getLogoStyle(settings.logoShape)} />
             )}
@@ -92,9 +92,9 @@ export default function Footer() {
           <div className="footer-section links">
             <h4>Enlaces Rápidos</h4>
             <ul>
-              <li><Link to="/">Inicio</Link></li>
-              <li><Link to="/">Catálogo</Link></li>
-              <li><Link to="/nosotras">Sobre Nosotros</Link></li>
+              <li><Link replace to="/">Inicio</Link></li>
+              <li><Link replace to="/">Catálogo</Link></li>
+              <li><Link replace to="/nosotras">Sobre Nosotros</Link></li>
               <li><a href="#contact">Contacto</a></li>
             </ul>
           </div>
