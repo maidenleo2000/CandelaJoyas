@@ -4,7 +4,7 @@ import './SidebarCarousel.css';
 const DEFAULT_HEIGHT_PX = 220;
 const DEFAULT_INTERVAL_SECONDS = 4.5;
 
-export default function SidebarCarousel({ images, heightPx, intervalSeconds }) {
+export default function SidebarCarousel({ images, heightPx, intervalSeconds, imageFit }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const timerRef = useRef(null);
 
@@ -34,7 +34,7 @@ export default function SidebarCarousel({ images, heightPx, intervalSeconds }) {
   };
 
   return (
-    <div className="sidebar-carousel" style={{ '--sidebar-carousel-height': `${resolvedHeight}px` }}>
+    <div className="sidebar-carousel" style={{ '--sidebar-carousel-height': `${resolvedHeight}px`, '--sidebar-carousel-image-fit': ['cover', 'fill'].includes(imageFit) ? imageFit : 'contain' }}>
       <div className="sidebar-carousel-track">
         {slides.map((slide, index) => {
           const content = (

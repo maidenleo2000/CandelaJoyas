@@ -171,6 +171,7 @@ export default function AdminDashboard() {
     showSidebarCarousel: false,
     sidebarCarouselImages: [],
     sidebarCarouselHeight: '220',
+    sidebarCarouselImageFit: 'contain',
     sidebarCarouselIntervalSeconds: '4.5',
     enableWhatsApp: true, // Default enabled
     enableMercadoPago: false, // Default disabled
@@ -2641,6 +2642,18 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                        <label htmlFor="sidebarCarouselImageFit">Ajuste de las imágenes</label>
+                        <select id="sidebarCarouselImageFit" name="sidebarCarouselImageFit" value={siteSettings.sidebarCarouselImageFit || 'contain'} onChange={handleSettingsChange}>
+                          <option value="contain">Mostrar imagen completa (sin recortar)</option>
+                          <option value="cover">Llenar el banner (con recorte)</option>
+                          <option value="fill">Estirar para llenar el banner (puede deformar la imagen)</option>
+                        </select>
+                        <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: '5px' }}>
+                          La imagen completa conserva sus proporciones y puede dejar márgenes. Llenar el banner puede cortar los bordes. Estirar ocupa todo el espacio sin recortar, pero puede deformar la imagen.
+                        </p>
+                      </div>
+
+                      <div className="form-group">
                         <label>Alto del carrusel (px): <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{siteSettings.sidebarCarouselHeight || '220'} px</span></label>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                           <input

@@ -195,6 +195,7 @@ export default function Home() {
           <SidebarCarousel
             images={settings.sidebarCarouselImages}
             heightPx={settings.sidebarCarouselHeight}
+            imageFit={settings.sidebarCarouselImageFit}
             intervalSeconds={settings.sidebarCarouselIntervalSeconds}
           />
         </div>

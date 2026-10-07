@@ -54,6 +54,7 @@ export default function SettingsProvider({ children }) {
     showSidebarCarousel: false,
     sidebarCarouselImages: [],
     sidebarCarouselHeight: '220',
+    sidebarCarouselImageFit: 'contain',
     sidebarCarouselIntervalSeconds: '4.5',
     // Checkout Settings
     checkoutRequireName: true,
