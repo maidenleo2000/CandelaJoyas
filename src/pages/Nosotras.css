@@ -57,3 +57,11 @@
     padding: 2rem;
   }
 }
+.contact-honeypot {
+  display: none;
+}
+
+.contact-form .submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

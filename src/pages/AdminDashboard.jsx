@@ -164,6 +164,7 @@ export default function AdminDashboard() {
     aboutTitle: '',
     aboutText: '',
     showContactForm: true,
+    contactFormEmail: '',
     catalogTitle: 'Catálogo',
     showVideoSlider: false,
     videoUrls: [],
@@ -835,6 +836,11 @@ export default function AdminDashboard() {
 
   const handleSettingsSubmit = async (e) => {
     e.preventDefault();
+    const contactEmail = (siteSettings.contactFormEmail || '').trim();
+    if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+      toast.error('Ingresá un email válido para recibir las consultas.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       let finalLogoUrl = siteSettings.logoUrl;
@@ -852,7 +858,7 @@ export default function AdminDashboard() {
         finalMaintenanceBgUrl = await uploadFile('settings', `maintenance_bg_${Date.now()}`, maintenanceBgFile);
       }
 
-      await updateSettings({ ...siteSettings, logoUrl: finalLogoUrl, faviconUrl: finalFaviconUrl, maintenanceBackgroundImage: finalMaintenanceBgUrl });
+      await updateSettings({ ...siteSettings, contactFormEmail: contactEmail, logoUrl: finalLogoUrl, faviconUrl: finalFaviconUrl, maintenanceBackgroundImage: finalMaintenanceBgUrl });
       setLogoFile(null);
       setFaviconFile(null);
       setMaintenanceBgFile(null);
@@ -3068,6 +3074,26 @@ export default function AdminDashboard() {
                           Incluir Formulario de Contacto al final
                         </label>
                       </div>
+                      {siteSettings.showContactForm && (
+                        <div className="form-group">
+                          <label htmlFor="contactFormEmail">Email que recibe los mensajes del formulario</label>
+                          <input
+                            id="contactFormEmail"
+                            type="email"
+                            name="contactFormEmail"
+                            value={siteSettings.contactFormEmail || ''}
+                            onChange={handleSettingsChange}
+                            placeholder="consultas@tutienda.com"
+                            maxLength={254}
+                          />
+                          <p className="form-hint">
+                            Guardá el correo destinatario y enviá una consulta de prueba desde el sitio publicado.
+                            FormSubmit te enviará un correo de activación que debés confirmar para recibir mensajes.
+                            Si cambiás el destinatario, deberás activar el nuevo correo.
+                            El formulario incluye captcha y protección adicional contra bots.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

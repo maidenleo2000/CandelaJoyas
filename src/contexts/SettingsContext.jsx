@@ -46,6 +46,7 @@ export default function SettingsProvider({ children }) {
     aboutTitle: 'Sobre Candela Joyas',
     aboutText: 'En Candela Joyas creemos que cada joya puede contar una historia y acompañarte en momentos especiales. Seleccionamos piezas que combinan elegancia, calidad y estilo, para que encuentres ese detalle que refleje tu personalidad y te haga brillar en cada momento.',
     showContactForm: true,
+    contactFormEmail: '',
     catalogTitle: 'Catálogo',
     // Video Slider Settings
     showVideoSlider: false,
