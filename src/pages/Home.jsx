@@ -11,7 +11,8 @@ import { pluralizeEs } from '../utils/labels';
 import './Home.css';
 
 export default function Home() {
-  const isFirstRender = useRef(true);
+  const loadMoreRef = useRef(null);
+  const productsGridRef = useRef(null);
   const { products, loading } = useProducts();
   const { categories: categoriesData, loading: categoriesLoading } = useCategories();
   const { settings } = useContext(SettingsContext);
@@ -21,7 +22,7 @@ export default function Home() {
   const [isGridView, setIsGridView] = useState(true); // true = grid, false = list
   const [selectedColor, setSelectedColor] = useState('All');
   const [selectedSize, setSelectedSize] = useState('All');
-  const [visibleCount, setVisibleCount] = useState(12); // Paginación inicial de 12 productos
+  const [visibleCount, setVisibleCount] = useState(4);
 
   
   // Obtenemos las categorías desde Firestore, o las derivamos de los productos si no hay (retrocompatibilidad)
@@ -153,15 +154,39 @@ export default function Home() {
 
   // Reiniciar la paginación cada vez que cambien los filtros
   useEffect(() => {
-    setVisibleCount(12);
+    setVisibleCount(4);
   }, [searchTerm, selectedCategory, priceSort, showOnlyOffers, selectedColor, selectedSize]);
 
   // Cortar la lista de productos para mostrar solo los visibles
   const displayedProducts = filteredProducts.slice(0, visibleCount);
-
-  const handleLoadMore = () => {
-    setVisibleCount(prevCount => prevCount + 12);
+  const hasActiveFilters = Boolean(searchTerm.trim() || selectedCategory !== 'All' || showOnlyOffers || selectedColor !== 'All' || selectedSize !== 'All');
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('All');
+    setShowOnlyOffers(false);
+    setSelectedColor('All');
+    setSelectedSize('All');
+    setPriceSort('default');
   };
+
+  useEffect(() => {
+    const sentinel = loadMoreRef.current;
+    if (loading || visibleCount >= filteredProducts.length || !sentinel) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        observer.disconnect();
+        const grid = productsGridRef.current;
+        const columns = isGridView && grid
+          ? getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length
+          : 1;
+        setVisibleCount(count => Math.min(count + Math.max(1, columns), filteredProducts.length));
+      }
+    }, { rootMargin: '0px', threshold: 1 });
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loading, visibleCount, filteredProducts, isGridView]);
 
   return (
     <div className="home-page animate-fade-in">
@@ -208,7 +233,15 @@ export default function Home() {
         <div className="shop-header" style={{ position: 'relative' }}>
           <div id="shop-results-anchor" style={{ position: 'absolute', top: '0' }}></div>
           <div className="shop-header-top">
-            <h2>Catálogo de Productos</h2>
+            <div>
+              <span className="catalog-eyebrow">Encontrá tu próxima favorita</span>
+              <h2>Catálogo de Productos</h2>
+            </div>
+            {!loading && (
+              <p className="catalog-count" role="status">
+                {filteredProducts.length} {filteredProducts.length === 1 ? 'producto' : 'productos'}
+              </p>
+            )}
           </div>
 
           <div className="shop-controls">
@@ -219,6 +252,7 @@ export default function Home() {
               <div className="select-wrapper">
                 <select 
                   value={selectedCategory} 
+                  aria-label="Categoría"
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="category-select"
                 >
@@ -236,6 +270,7 @@ export default function Home() {
               <div className="select-wrapper">
                 <select 
                   value={priceSort} 
+                  aria-label="Ordenar por precio"
                   onChange={(e) => setPriceSort(e.target.value)}
                   className="sort-select"
                 >
@@ -252,6 +287,7 @@ export default function Home() {
                 <div className="select-wrapper">
                   <select
                     value={selectedColor}
+                    aria-label={settings.colorLabel || 'Color'}
                     onChange={(e) => setSelectedColor(e.target.value)}
                     className="sort-select"
                   >
@@ -270,6 +306,7 @@ export default function Home() {
                 <div className="select-wrapper">
                   <select
                     value={selectedSize}
+                    aria-label={settings.sizeLabel || 'Talle'}
                     onChange={(e) => setSelectedSize(e.target.value)}
                     className="sort-select"
                   >
@@ -291,6 +328,7 @@ export default function Home() {
                   <input
                     type="checkbox"
                     checked={showOnlyOffers}
+                    aria-label="Solo ofertas"
                     onChange={(e) => setShowOnlyOffers(e.target.checked)}
                   />
                   <span className="slider"></span>
@@ -303,6 +341,7 @@ export default function Home() {
                   <input
                     type="checkbox"
                     checked={isGridView}
+                    aria-label="Vista cuadrícula"
                     onChange={(e) => setIsGridView(e.target.checked)}
                   />
                   <span className="slider"></span>
@@ -313,6 +352,13 @@ export default function Home() {
         </div>
         </div>
 
+        {hasActiveFilters && (
+          <div className="catalog-filter-summary">
+            <p>{searchTerm.trim() ? `Resultados para “${searchTerm.trim()}”` : 'Estás viendo un catálogo filtrado'}{selectedCategory !== 'All' ? ` · ${selectedCategory}` : ''}</p>
+            <button className="catalog-clear" onClick={clearFilters}>Limpiar filtros</button>
+          </div>
+        )}
+
         {loading ? (
           <div className="loading-state flex-center">
             <div className="loader"></div>
@@ -320,22 +366,18 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <div className={`products-grid ${isGridView ? 'grid' : 'list'}`}>
+            <div ref={productsGridRef} className={`products-grid ${isGridView ? 'grid' : 'list'}`}>
               {displayedProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
             
-            {!loading && visibleCount < filteredProducts.length && (
-              <div style={{ textAlign: 'center', marginTop: '3rem', marginBottom: '2rem' }}>
-                <button 
-                  className="btn btn-primary" 
-                  onClick={handleLoadMore}
-                  style={{ padding: '0.8rem 2.5rem', fontSize: '1rem', borderRadius: '50px', cursor: 'pointer', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
-                >
-                  Cargar más productos
-                </button>
-                <p style={{ marginTop: '0.8rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            {filteredProducts.length > 0 && (
+              <div className="catalog-progress">
+                {visibleCount < filteredProducts.length && (
+                  <div ref={loadMoreRef} className="catalog-scroll-sentinel" aria-hidden="true" />
+                )}
+                <p role="status">
                   Mostrando {displayedProducts.length} de {filteredProducts.length} productos
                 </p>
               </div>
@@ -346,14 +388,7 @@ export default function Home() {
         {!loading && filteredProducts.length === 0 && (
           <div className="empty-state">
             <p>{searchTerm ? `No se encontraron resultados para "${searchTerm}"` : "No se encontraron productos en esta categoría."}</p>
-            <button className="btn btn-outline" onClick={() => { 
-              setSelectedCategory('All'); 
-              setShowOnlyOffers(false); 
-              setSearchTerm(''); 
-              setSelectedColor('All');
-              setSelectedSize('All');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}>
+            <button className="btn btn-outline" onClick={clearFilters}>
 
               Limpiar Filtros
             </button>
