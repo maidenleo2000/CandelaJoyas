@@ -2505,13 +2505,13 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="form-group" style={{ marginTop: '1.5rem' }}>
-                    <label>Velocidad de la marquesina (segundos): <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{siteSettings.marqueeSpeed || '30'}s</span></label>
+                    <label>Duración del recorrido (segundos): <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{siteSettings.marqueeSpeed || '30'}s</span></label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                       <input
                         type="range"
                         name="marqueeSpeed"
                         min="10"
-                        max="60"
+                        max="300"
                         step="1"
                         value={siteSettings.marqueeSpeed || '30'}
                         onChange={handleSettingsChange}
@@ -2522,7 +2522,7 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                     <p className="text-muted" style={{ fontSize: '0.75rem', marginTop: '5px' }}>
-                      Un valor menor hace que el texto se mueva más rápido; un valor mayor lo hace más lento.
+                      Mové el control hacia la derecha para que el texto pase más lento. Podés elegir entre 10 y 300 segundos (5 minutos) por recorrido.
                     </p>
                   </div>
 
