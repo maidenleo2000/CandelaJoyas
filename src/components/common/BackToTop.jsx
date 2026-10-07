@@ -31,11 +31,12 @@ export default function BackToTop() {
 
   return (
     <button
+      type="button"
       className={`back-to-top ${isVisible ? 'visible' : ''}`}
       onClick={scrollToTop}
       aria-label="Volver arriba"
     >
-      <ChevronUp size={24} />
+      <ChevronUp size={20} strokeWidth={1.5} />
     </button>
   );
 }
