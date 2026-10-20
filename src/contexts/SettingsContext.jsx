@@ -17,6 +17,8 @@ export default function SettingsProvider({ children }) {
     heroTitleSize: '1.5', // rem
     heroSubtitleSize: '1', // rem
     showBackToTop: true,
+    showLiveVisitors: false,
+    liveVisitorsPosition: 'footer',
     whatsappNumber: '',
     bankAlias: '',
     logoShape: 'normal',

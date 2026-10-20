@@ -1,5 +1,4 @@
 import { supabase } from './supabase';
-import { rangeBounds } from '../utils/metrics';
 
 // Use the returned length rather than assuming the server's configured row limit.
 export async function readAllRows(makeQuery, signal) {
@@ -21,15 +20,12 @@ export async function readAllRows(makeQuery, signal) {
 }
 
 export async function loadMetrics(range, signal, now = new Date()) {
-  const { from, until } = rangeBounds(range, now);
   const snapshot = now.toISOString();
   const [visits, views] = await Promise.all([
     readAllRows(() => supabase.from('site_visits').select('id,visitor_id,first_seen_at', { count: 'exact' }).lte('first_seen_at', snapshot).order('first_seen_at').order('id'), signal),
-    readAllRows(() => {
-      let query = supabase.from('page_views').select('id,path,product_id,visitor_id,viewed_at,products(name)', { count: 'exact' }).lt('viewed_at', until).lte('viewed_at', snapshot).order('viewed_at').order('id');
-      if (from) query = query.gte('viewed_at', from);
-      return query;
-    }, signal),
+    // All timestamps are needed to recover legacy daily activity and keep the
+    // historical visitor total independent of the selected reporting period.
+    readAllRows(() => supabase.from('page_views').select('id,path,product_id,visitor_id,viewed_at,products(name)', { count: 'exact' }).lte('viewed_at', snapshot).order('viewed_at').order('id'), signal),
   ]);
   return { visits, views, now };
 }

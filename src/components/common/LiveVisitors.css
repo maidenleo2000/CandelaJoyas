@@ -1,0 +1,22 @@
+.live-visitors { color: #4f4a57; }
+.live-visitors p { display: flex; align-items: center; gap: 9px; margin: 0; font-size: .88rem; }
+.live-visitors-dot { width: 8px; height: 8px; border-radius: 50%; background: #3d9360; flex-shrink: 0; }
+.live-visitors-offline { background: #9b9690; }
+.live-visitors-public { display: flex; justify-content: center; padding: 14px 20px; background: #faf7f1; border-top: 1px solid #e9e5df; }
+.live-visitors-floating { position: fixed; box-sizing: border-box; width: max-content; max-width: calc(100vw - 88px); left: 16px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); padding: 0 0 0 14px; gap: 4px; align-items: center; z-index: 98; border: 1px solid #e9e5df; border-radius: 999px; box-shadow: 0 4px 18px #0000001a; }
+.live-visitors-floating p { font-size: .8rem; }
+.live-visitors-footer { align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.live-visitors-restore { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #6d6870; cursor: pointer; }
+.live-visitors-restore:hover { background: #eee8de; }
+.live-visitors-restore:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.live-visitors-close { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #6d6870; cursor: pointer; }
+.live-visitors-close:hover { background: #eee8de; color: #303044; }
+.live-visitors-close:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -4px; }
+@media (max-width: 600px) { .live-visitors-floating { left: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); } }
+.live-visitors-admin .live-visitors-position { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; font-size: .85rem; }
+.live-visitors-position select { width: 100%; max-width: 340px; }
+.live-visitors-admin { padding: 22px; margin-bottom: 22px; border: 1px solid #e9e5df; background: white; border-radius: 14px; }
+.live-visitors-admin h2 { font-size: 1rem; margin: 0 0 12px; }
+.live-visitors-admin .live-visitors-toggle { display: flex; gap: 10px; align-items: center; margin: 18px 0 8px; font-size: .85rem; cursor: pointer; }
+.live-visitors-toggle input { width: 18px; height: 18px; accent-color: var(--color-primary); }
+.live-visitors-admin small { display: block; line-height: 1.6; color: #827a70; max-width: 720px; }

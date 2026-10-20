@@ -24,6 +24,9 @@ import { useMaintenanceStatus } from './hooks/useMaintenanceStatus';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
 import { usePageViewTracking } from './hooks/usePageViewTracking';
 import './App.css';
+import { useLiveVisitors } from './hooks/useLiveVisitors';
+import { LiveVisitorsContext } from './contexts/LiveVisitorsContext';
+import LiveVisitors from './components/common/LiveVisitors';
 
 function AppShell() {
   const { settings } = useContext(SettingsContext);
@@ -33,6 +36,7 @@ function AppShell() {
 
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isAdmin = userRole === 'admin';
+  const liveVisitors = useLiveVisitors(!isAdminRoute && !isAdmin && !maintenanceActive);
 
   useVisitorTracking(!isAdminRoute && !isAdmin);
   usePageViewTracking(!isAdminRoute && !isAdmin);
@@ -42,6 +46,7 @@ function AppShell() {
   }
 
   return (
+    <LiveVisitorsContext.Provider value={liveVisitors}>
     <div className={`app-container ${settings.showMarquee ? 'has-marquee' : ''}`}>
       <Header />
       <main className="main-content">
@@ -57,9 +62,11 @@ function AppShell() {
           <Route path="/success" element={<SuccessPage />} />
         </Routes>
       </main>
+      {!isAdminRoute && <LiveVisitors />}
       <Footer />
       <BackToTop />
     </div>
+    </LiveVisitorsContext.Provider>
   );
 }
 
