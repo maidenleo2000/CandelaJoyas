@@ -1,4 +1,5 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
+import { usePageSeo } from '../hooks/usePageSeo';
 import { SettingsContext } from '../contexts/SettingsContext';
 import { Send } from 'lucide-react';
 import PageHeader from '../components/common/PageHeader';
@@ -9,10 +10,11 @@ export default function Nosotras() {
   const contactEmail = (settings.contactFormEmail || '').trim();
   const hasContactEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail);
   
-  useEffect(() => {
-    const baseTitle = settings.siteTitle || 'Candela Joyas';
-    document.title = `${settings.aboutTitle || 'Sobre Nosotros'} | ${baseTitle}`;
-  }, [settings.siteTitle, settings.aboutTitle]);
+  usePageSeo({
+    title: `${settings.aboutTitle || 'Sobre Nosotras'} | ${settings.siteTitle || 'Candela Joyas'}`,
+    description: settings.aboutText || 'Conocé Candela Joyas y contactanos para consultar por nuestras joyas y accesorios.',
+    noindex: !settings.showAbout,
+  });
 
   if (!settings.showAbout) {
     return (

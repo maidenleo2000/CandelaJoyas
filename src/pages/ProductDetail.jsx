@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast';
 import { getStockKey, hasVariantSelected } from '../utils/stock';
 import { getInstallmentPrice, getCashPrice } from '../utils/pricing';
 import './ProductDetail.css';
+import { usePageSeo } from '../hooks/usePageSeo';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -106,13 +107,15 @@ export default function ProductDetail() {
     }
   }, [id, products, product]);
   
-  // SEO: Update page title with product name
-  useEffect(() => {
-    if (product) {
-      const baseTitle = settings.siteTitle || 'Candela Joyas';
-      document.title = `${product.name} - Talles Reales | ${baseTitle}`;
-    }
-  }, [product, settings.siteTitle]);
+  const seoProduct = products.find(item => item.id === id && !item.isHidden);
+  usePageSeo({
+    title: `${seoProduct?.name || (loading ? 'Producto' : 'Producto no encontrado')} | ${settings.siteTitle || 'Candela Joyas'}`,
+    description: seoProduct?.description || (seoProduct
+      ? `Descubrí ${seoProduct.name} en ${settings.siteTitle || 'Candela Joyas'}. Consultá sus detalles y opciones disponibles.`
+      : 'Consultá nuestro catálogo de joyas y accesorios.'),
+    image: seoProduct?.imageUrl || seoProduct?.images?.[0]?.url,
+    noindex: !loading && !seoProduct,
+  });
 
   // Cambiar imagen al seleccionar color
   useEffect(() => {
@@ -150,7 +153,7 @@ export default function ProductDetail() {
   };
 
   if (loading) return <div className="loading-state flex-center"><div className="loader"></div></div>;
-  if (!product) return <div className="container empty-state"><h3>Producto no encontrado</h3><Link replace to="/" className="btn btn-outline">Volver a inicio</Link></div>;
+  if (!product) return <div className="container empty-state"><h1>Producto no encontrado</h1><Link replace to="/" className="btn btn-outline">Volver a inicio</Link></div>;
 
   const videoId = getYoutubeId(product.videoUrl);
   
@@ -482,7 +485,7 @@ export default function ProductDetail() {
           <div className="product-description-container">
             <h4>Descripción</h4>
             <p className="product-description">
-              {product.description || 'Prenda de alta calidad diseñada para brindar confort y elegancia. Ideal para complementar tu estilo en esta temporada.'}
+              {product.description || 'Una joya para complementar tu estilo. Consultanos para conocer más detalles de este producto.'}
             </p>
           </div>
         </div>

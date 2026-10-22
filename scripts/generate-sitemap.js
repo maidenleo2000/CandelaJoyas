@@ -1,57 +1,48 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
+import { writeFileSync } from 'node:fs';
+import { loadEnv } from 'vite';
 
-// Cargamos variables de entorno manualmente desde .env
-const envFile = fs.readFileSync('.env', 'utf8');
-const env = {};
-envFile.split('\n').forEach(line => {
-    const [key, value] = line.split('=');
-    if (key && value) {
-        env[key.trim()] = value.replace(/"/g, '').trim();
-    }
-});
-
-const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY);
+const env = { ...loadEnv('production', process.cwd(), 'VITE_'), ...process.env };
+const baseUrl = 'https://candelajoyas.com.ar';
+const escapeXml = value => String(value).replace(/[<>&"']/g, character => ({
+  '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;',
+})[character]);
 
 async function generate() {
-  console.log('--- Iniciando Generación de Sitemap ---');
-  try {
-    console.log('Conectando con Supabase...');
-    const { data: products, error } = await supabase.from('products').select('id, category');
-    if (error) throw error;
-
-    const baseUrl = 'https://candelajoyas.com.ar';
-    const categories = [...new Set(products.map(p => p.category))];
-
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${baseUrl}/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  ${categories.filter(c => c).map(cat => `
-  <url>
-    <loc>${baseUrl}/?category=${encodeURIComponent(cat)}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`).join('')}
-  ${products.map(p => `
-  <url>
-    <loc>${baseUrl}/product/${p.id}</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>`).join('')}
-</urlset>`;
-
-    fs.writeFileSync('public/sitemap.xml', sitemap);
-    console.log(`✅ Éxito: Se ha generado el sitemap con ${products.length} productos y ${categories.length} categorías.`);
-    process.exit(0);
-  } catch (error) {
-    console.error('❌ Error al generar el sitemap:', error);
-    process.exit(1);
+  if (!env.VITE_SUPABASE_URL || !env.VITE_SUPABASE_ANON_KEY) {
+    throw new Error('Faltan VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.');
   }
+  const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const products = [];
+  const pageSize = 1000;
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabase.from('products')
+      .select('id, is_hidden, updated_at').order('id')
+      .range(offset, offset + pageSize - 1);
+    if (error) throw error;
+    products.push(...data.filter(product => !product.is_hidden));
+    if (data.length < pageSize) break;
+  }
+
+  const entries = ['/', '/nosotras', '/como-comprar'].map(path => ({ path }));
+  entries.push(...products.map(product => ({
+    path: `/product/${encodeURIComponent(product.id)}`,
+    updatedAt: product.updated_at,
+  })));
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.map(({ path, updatedAt }) => {
+    const date = updatedAt ? new Date(updatedAt) : null;
+    const lastmod = date && !Number.isNaN(date.getTime())
+      ? `\n    <lastmod>${date.toISOString()}</lastmod>` : '';
+    return `  <url>\n    <loc>${escapeXml(baseUrl + path)}</loc>${lastmod}\n  </url>`;
+  }).join('\n')}\n</urlset>\n`;
+
+  writeFileSync(new URL('../public/sitemap.xml', import.meta.url), sitemap);
+  console.log(`Sitemap generado: ${products.length} productos públicos y 3 páginas.`);
 }
 
-generate();
+generate().catch(error => {
+  console.error('No se pudo generar el sitemap:', error.message);
+  process.exitCode = 1;
+});

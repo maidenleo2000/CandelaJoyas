@@ -4,9 +4,14 @@ import { supabase } from '../services/supabase';
 import { SettingsContext } from '../contexts/SettingsContext';
 import PageHeader from '../components/common/PageHeader';
 import './HowToBuy.css';
+import { usePageSeo } from '../hooks/usePageSeo';
 
 export default function HowToBuy() {
   const { settings } = useContext(SettingsContext);
+  usePageSeo({
+    title: `Cómo comprar | ${settings.siteTitle || 'Candela Joyas'}`,
+    description: 'Conocé los pasos para comprar en Candela Joyas: elegí tus productos, agregalos al carrito y consultá las opciones de pago y entrega.',
+  });
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
 

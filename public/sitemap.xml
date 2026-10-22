@@ -2,42 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://candelajoyas.com.ar/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  
-  <url>
-    <loc>https://candelajoyas.com.ar/?category=Aros</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://candelajoyas.com.ar/?category=Pulseras</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://candelajoyas.com.ar/nosotras</loc>
   </url>
   <url>
-    <loc>https://candelajoyas.com.ar/?category=Anillos</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://candelajoyas.com.ar/product/d2cff05e-6457-4311-bff3-00f14077fc26</loc>
-    <lastmod>2026-08-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://candelajoyas.com.ar/como-comprar</loc>
   </url>
   <url>
-    <loc>https://candelajoyas.com.ar/product/977cb230-2d3c-424c-9561-3ec4fa3a688d</loc>
-    <lastmod>2026-08-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://candelajoyas.com.ar/product/0dd91e4b-c8fb-4a3a-9ac7-b6043c11175f</loc>
+    <lastmod>2026-08-25T14:54:18.173Z</lastmod>
   </url>
   <url>
-    <loc>https://candelajoyas.com.ar/product/0ea54376-b919-421a-81a5-a8fb164377c0</loc>
-    <lastmod>2026-08-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://candelajoyas.com.ar/product/0e0a4b1e-8cbe-481a-853e-a08c8e780ee8</loc>
+    <lastmod>2026-08-25T14:30:13.919Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/145e4594-f271-46d2-9998-c201eb6561e6</loc>
+    <lastmod>2026-08-25T14:00:28.524Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/1aa59ff4-44fa-4d44-b259-0ce05af37fbd</loc>
+    <lastmod>2026-08-25T14:29:59.472Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/58a9c5a0-5e27-4724-8234-fca941e1cbb8</loc>
+    <lastmod>2026-08-25T13:38:21.812Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/724861e4-6907-4443-ab68-ddee506d60e3</loc>
+    <lastmod>2026-08-25T13:59:43.905Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/9aca7c31-3d44-4f5b-a60b-084e46a65476</loc>
+    <lastmod>2026-08-25T14:49:59.822Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/a8ec2744-39b1-44bc-91cd-8a878c77d43e</loc>
+    <lastmod>2026-08-25T14:37:29.789Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/c134a305-4cc7-4328-9b3c-b425c8f404bd</loc>
+    <lastmod>2026-08-25T14:18:06.854Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/c9e2fb2a-f242-4cbc-bbba-85b9c1ded558</loc>
+    <lastmod>2026-08-25T14:29:02.094Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/de1d9479-4ffc-42a5-b039-673337315fed</loc>
+    <lastmod>2026-08-25T14:10:33.752Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/e3855d9f-6f9a-496e-8578-bf055ea4214d</loc>
+    <lastmod>2026-08-25T14:01:17.778Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/e58a2ed3-9667-4514-9ece-ede5047b34ae</loc>
+    <lastmod>2026-08-25T14:45:35.936Z</lastmod>
+  </url>
+  <url>
+    <loc>https://candelajoyas.com.ar/product/f2d49242-a6d3-439b-af59-ce5e06edf00b</loc>
+    <lastmod>2026-08-24T20:47:44.711Z</lastmod>
   </url>
 </urlset>

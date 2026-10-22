@@ -9,6 +9,7 @@ import VideoSlider from '../components/common/VideoSlider';
 import SidebarCarousel from '../components/common/SidebarCarousel';
 import { pluralizeEs } from '../utils/labels';
 import './Home.css';
+import { usePageSeo } from '../hooks/usePageSeo';
 
 export default function Home() {
   const loadMoreRef = useRef(null);
@@ -102,15 +103,7 @@ export default function Home() {
     return result;
   }, [products, selectedCategory, priceSort, showOnlyOffers, searchTerm, selectedColor, selectedSize]);
 
-  // SEO: Actualizamos el título de la pestaña según la categoría seleccionada
-  useEffect(() => {
-    const baseTitle = settings.siteTitle || 'Candela Joyas';
-    if (selectedCategory === 'All') {
-      document.title = `${baseTitle} | Brillá en cada momento.`;
-    } else {
-      document.title = `${selectedCategory} Brilla siempre | ${baseTitle}`;
-    }
-  }, [selectedCategory, settings.siteTitle]);
+  usePageSeo({ title: `${settings.siteTitle || 'Candela Joyas'} | Joyas de plata y accesorios` });
   
   const handleScrollToShop = (e, behavior = 'smooth') => {
     if (e && e.preventDefault) e.preventDefault();
@@ -236,7 +229,9 @@ export default function Home() {
           <div className="shop-header-top">
             <div>
               <span className="catalog-eyebrow">Encontrá tu próxima favorita</span>
-              <h2>Catálogo de Productos</h2>
+              {settings.showHero === false || searchTerm
+                ? <h1>Catálogo de Productos</h1>
+                : <h2>Catálogo de Productos</h2>}
             </div>
             {!loading && (
               <p className="catalog-count" role="status">

@@ -24,6 +24,7 @@ import { useMaintenanceStatus } from './hooks/useMaintenanceStatus';
 import { useVisitorTracking } from './hooks/useVisitorTracking';
 import { usePageViewTracking } from './hooks/usePageViewTracking';
 import './App.css';
+import { usePageSeo } from './hooks/usePageSeo';
 import { useLiveVisitors } from './hooks/useLiveVisitors';
 import { LiveVisitorsContext } from './contexts/LiveVisitorsContext';
 import LiveVisitors from './components/common/LiveVisitors';
@@ -36,6 +37,13 @@ function AppShell() {
 
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isAdmin = userRole === 'admin';
+  const isPublicRoute = ['/', '/nosotras', '/como-comprar'].includes(location.pathname)
+    || location.pathname.startsWith('/product/');
+  usePageSeo({
+    title: settings.siteTitle || 'Candela Joyas',
+    noindex: true,
+    enabled: !isPublicRoute || maintenanceActive,
+  });
   const liveVisitors = useLiveVisitors(!isAdminRoute && !isAdmin && !maintenanceActive);
 
   useVisitorTracking(!isAdminRoute && !isAdmin);

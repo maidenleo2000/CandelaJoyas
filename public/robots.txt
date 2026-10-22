@@ -1,16 +1,8 @@
-# Optimized robots.txt for Candela Joyas
-# Focused on inclusivity and efficiency
-
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /mi-cuenta
+Disallow: /restablecer-contrasena
+Disallow: /success
 
-# Disallow admin and private areas
-Disallow: /admin/
-Disallow: /admin/*
-
-# Sitemap location
 Sitemap: https://candelajoyas.com.ar/sitemap.xml
-
-# Crawl-delay for some bots to preserve server resources
-User-agent: magpie-crawler
-Crawl-delay: 10
